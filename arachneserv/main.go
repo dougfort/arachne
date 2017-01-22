@@ -1,9 +1,16 @@
 package main
 
-import "os"
+import (
+	"io"
+	"net/http"
+)
 
-// main is the main entry point
-// all it does is exit with an error code
+func hello(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, "Hello world!")
+}
+
 func main() {
-	os.Exit(run())
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", hello)
+	http.ListenAndServe(":8000", mux)
 }
