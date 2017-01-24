@@ -1,4 +1,4 @@
-package model
+package types
 
 // Suit represents the suit of a card
 type Suit uint8

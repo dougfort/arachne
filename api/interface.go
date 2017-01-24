@@ -1,6 +1,6 @@
 package api
 
-import "github.com/dougfort/arachne/model"
+import "github.com/dougfort/arachne/types"
 
 // GameInfo reports the state of a game
 type GameInfo struct {
@@ -12,7 +12,7 @@ type GameInfo struct {
 	RemainingCards int
 
 	// Tableau is the actual cards laid out in stacks
-	Tableau model.Tableau
+	Tableau types.Tableau
 }
 
 // ArachneAPI describes the entry points used to communicate with arachneserv
