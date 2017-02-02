@@ -15,13 +15,3 @@ const TableauWidth = 10
 
 // Tableau is the outer (visible) game layout
 type Tableau [TableauWidth]StackType
-
-// HiddenCards represents the Cards that are not visible in the Tableau
-type HiddenCards [TableauWidth]gocards.Card
-
-// Game represents a complete, playable, game
-type Game struct {
-	Deck        gocards.PlayableDeck
-	Tableau     Tableau
-	HiddenCards HiddenCards
-}
