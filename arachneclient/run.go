@@ -1,21 +1,49 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
 )
+
+type gameData struct{}
 
 // run is the actual main body of the program
 // it returns an exit code to main
 func run() int {
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	var err error
+	var exitCode int
+	var game gameData
 
-	log.Printf("info: wait signal")
-	s := <-sigChan
-	log.Printf("info: signal %v", s)
+	log.Printf("info: start")
+	fmt.Println("arachne starts")
 
-	return 0
+	scanner := bufio.NewScanner(os.Stdin)
+
+	fmt.Println("")
+	fmt.Printf(">")
+
+RUN_LOOP:
+	for scanner.Scan() {
+		switch scanner.Text() {
+		case "new":
+			fmt.Println("starting new game")
+			if game, err = newGame(); err != nil {
+				fmt.Printf("newGame failed: %s", err)
+				break RUN_LOOP
+			}
+			log.Printf("debug: game = %v", game)
+		case "quit":
+			fmt.Println("quitting")
+			break RUN_LOOP
+		default:
+			fmt.Println("unknown command")
+		}
+		fmt.Println("")
+		fmt.Printf(">")
+	}
+	log.Printf("info: end")
+
+	return exitCode
 }
