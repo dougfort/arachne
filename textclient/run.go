@@ -5,9 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/dougfort/arachne/game"
 )
 
-type gameData struct{}
+type gameData struct {
+	remote game.Game // remote game
+}
 
 // run is the actual main body of the program
 // it returns an exit code to main
@@ -26,6 +30,9 @@ func run() int {
 
 RUN_LOOP:
 	for scanner.Scan() {
+
+		displayTableau(game)
+
 		switch scanner.Text() {
 		case "new":
 			fmt.Println("starting new game")
