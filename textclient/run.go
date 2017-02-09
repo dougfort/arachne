@@ -31,8 +31,6 @@ func run() int {
 RUN_LOOP:
 	for scanner.Scan() {
 
-		displayTableau(game)
-
 		switch scanner.Text() {
 		case "new":
 			fmt.Println("starting new game")
@@ -40,7 +38,7 @@ RUN_LOOP:
 				fmt.Printf("newGame failed: %s", err)
 				break RUN_LOOP
 			}
-			log.Printf("debug: game = %v", game)
+			displayTableau(game)
 		case "quit":
 			fmt.Println("quitting")
 			break RUN_LOOP

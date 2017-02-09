@@ -14,7 +14,7 @@ func TestDisplayCards(t *testing.T) {
 	for suit := standard.Clubs; suit <= standard.Spades; suit++ {
 		for rank := standard.Ace; rank <= standard.King; rank++ {
 			card := gocards.Card{Suit: suit, Rank: rank}
-			v, ok := dislayCards[card]
+			v, ok := displayCards[card]
 			if !ok {
 				t.Fatalf("unmatched card: %s", card.Value())
 			}

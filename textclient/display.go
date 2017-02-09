@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/dougfort/arachne/types"
 	"github.com/dougfort/gocards"
 	"github.com/dougfort/gocards/standard"
 )
@@ -11,7 +14,7 @@ const displayCardBack = '🂠'
 type displayCardsMap map[gocards.Card]rune
 
 var (
-	dislayCards = displayCardsMap{
+	displayCards = displayCardsMap{
 		gocards.Card{Suit: standard.Clubs, Rank: standard.Ace}:      '🃑',
 		gocards.Card{Suit: standard.Clubs, Rank: standard.Two}:      '🃒',
 		gocards.Card{Suit: standard.Clubs, Rank: standard.Three}:    '🃓',
@@ -68,5 +71,34 @@ var (
 )
 
 func displayTableau(game gameData) {
+	var row int
+	var image [types.TableauWidth]rune
 
+ROW_LOOP:
+	for {
+		var found bool
+		for col := 0; col < types.TableauWidth; col++ {
+			if row < game.remote.Tableau[col].HiddenCount {
+				image[col] = displayCardBack
+				found = true
+			} else {
+				visibleRow := row - game.remote.Tableau[col].HiddenCount
+				if visibleRow < len(game.remote.Tableau[col].Cards) {
+					image[col] = displayCards[game.remote.Tableau[col].Cards[visibleRow]]
+					found = true
+				} else {
+					image[col] = ' '
+				}
+			}
+		}
+		if !found {
+			break ROW_LOOP
+		}
+		fmt.Printf("%c %c %c %c %c %c %c %c %c %c\n",
+			image[0], image[1], image[2], image[3], image[4],
+			image[5], image[6], image[7], image[8], image[9],
+		)
+
+		row++
+	}
 }
