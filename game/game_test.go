@@ -3,12 +3,15 @@ package game
 import (
 	"testing"
 
+	"github.com/dougfort/gocards"
+
 	"github.com/dougfort/arachne/types"
 )
 
 func TestGame(t *testing.T) {
 	var expectedHidden = [types.TableauWidth]int{5, 4, 4, 5, 4, 4, 5, 4, 4, 5}
 
+	cardCount := make(map[gocards.Card]int)
 	g := New()
 
 	var totalHidden int
@@ -22,6 +25,16 @@ func TestGame(t *testing.T) {
 				col, g.Tableau[col].HiddenCount, expectedHidden[col])
 		}
 		totalHidden += len(g.HiddenCards[col])
+		for _, card := range g.HiddenCards[col] {
+			cardCount[card]++
+		}
+	}
+
+	// we expect each hidden card to occur 1-2 times
+	for card, count := range cardCount {
+		if count > 2 {
+			t.Fatalf("hidden card error: %s: count=%d", card.Value(), count)
+		}
 	}
 
 	// TODO: fix magic numbers 4 * 13

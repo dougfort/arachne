@@ -67,18 +67,27 @@ func initialDeal(deck gocards.PlayableDeck) (types.Tableau, HiddenCards) {
 	}
 
 	var row int
-	var ok bool
-	for col := 0; col < types.TableauWidth; col++ {
-		if row < tab[col].HiddenCount {
-			hid[col][row], ok = deck.Next()
-			if !ok {
-				panic("initialDeal")
+ROW_LOOP:
+	for {
+		var found bool
+		for col := 0; col < types.TableauWidth; col++ {
+			var ok bool
+			if row < tab[col].HiddenCount {
+				hid[col][row], ok = deck.Next()
+				if !ok {
+					panic("initialDeal")
+				}
+				found = true
+			} else if row == tab[col].HiddenCount {
+				tab[row].Cards[0], ok = deck.Next()
+				if !ok {
+					panic("initialDeal")
+				}
+				found = true
 			}
-		} else if row == tab[col].HiddenCount {
-			tab[row].Cards[0], ok = deck.Next()
-			if !ok {
-				panic("initialDeal")
-			}
+		}
+		if !found {
+			break ROW_LOOP
 		}
 		row++
 	}
