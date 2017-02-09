@@ -44,4 +44,18 @@ func TestGame(t *testing.T) {
 		t.Fatalf("invalid remaining: expected %d, found %d",
 			expectedRemaining, g.Deck.RemainingCards())
 	}
+
+	cardCount = make(map[gocards.Card]int)
+	for _, tab := range g.Tableau {
+		if len(tab.Cards) != 1 {
+			t.Fatalf("invalid len: %d", len(tab.Cards))
+		}
+		cardCount[tab.Cards[0]]++
+	}
+
+	for card, count := range cardCount {
+		if count > 2 {
+			t.Fatalf("too many %s cards: %d", card.Value(), count)
+		}
+	}
 }

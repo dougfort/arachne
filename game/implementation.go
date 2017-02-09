@@ -79,7 +79,7 @@ ROW_LOOP:
 				}
 				found = true
 			} else if row == tab[col].HiddenCount {
-				tab[row].Cards[0], ok = deck.Next()
+				tab[col].Cards[0], ok = deck.Next()
 				if !ok {
 					panic("initialDeal")
 				}
