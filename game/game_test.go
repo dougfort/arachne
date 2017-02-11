@@ -4,18 +4,16 @@ import (
 	"testing"
 
 	"github.com/dougfort/gocards"
-
-	"github.com/dougfort/arachne/types"
 )
 
 func TestGame(t *testing.T) {
-	var expectedHidden = [types.TableauWidth]int{5, 4, 4, 5, 4, 4, 5, 4, 4, 5}
+	var expectedHidden = [TableauWidth]int{5, 4, 4, 5, 4, 4, 5, 4, 4, 5}
 
 	cardCount := make(map[gocards.Card]int)
 	g := New()
 
 	var totalHidden int
-	for col := 0; col < types.TableauWidth; col++ {
+	for col := 0; col < TableauWidth; col++ {
 		if len(g.HiddenCards[col]) != expectedHidden[col] {
 			t.Fatalf("col: %d; hidden cards mismatch: %d != %d",
 				col, len(g.HiddenCards[col]), expectedHidden[col])
@@ -38,7 +36,7 @@ func TestGame(t *testing.T) {
 	}
 
 	// TODO: fix magic numbers 4 * 13
-	expectedRemaining := deckCount*(4*13) - (totalHidden + types.TableauWidth)
+	expectedRemaining := deckCount*(4*13) - (totalHidden + TableauWidth)
 
 	if g.Deck.RemainingCards() != expectedRemaining {
 		t.Fatalf("invalid remaining: expected %d, found %d",

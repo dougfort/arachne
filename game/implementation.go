@@ -3,17 +3,15 @@ package game
 import (
 	"github.com/dougfort/gocards"
 	"github.com/dougfort/gocards/standard"
-
-	"github.com/dougfort/arachne/types"
 )
 
 // HiddenCards represents the Cards that are not visible in the Tableau
-type HiddenCards [types.TableauWidth]gocards.Cards
+type HiddenCards [TableauWidth]gocards.Cards
 
 // Game represents a complete, playable, game
 type Game struct {
 	Deck        gocards.PlayableDeck
-	Tableau     types.Tableau
+	Tableau     Tableau
 	HiddenCards HiddenCards
 }
 
@@ -40,18 +38,18 @@ func New() Game {
 // X     X     X     X
 //
 // where '.' is a hidden card and 'X' is visible
-func initialDeal(deck gocards.PlayableDeck) (types.Tableau, HiddenCards) {
-	var tab = types.Tableau{
-		types.StackType{HiddenCount: 5, Cards: make(gocards.Cards, 1)},
-		types.StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
-		types.StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
-		types.StackType{HiddenCount: 5, Cards: make(gocards.Cards, 1)},
-		types.StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
-		types.StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
-		types.StackType{HiddenCount: 5, Cards: make(gocards.Cards, 1)},
-		types.StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
-		types.StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
-		types.StackType{HiddenCount: 5, Cards: make(gocards.Cards, 1)},
+func initialDeal(deck gocards.PlayableDeck) (Tableau, HiddenCards) {
+	var tab = Tableau{
+		StackType{HiddenCount: 5, Cards: make(gocards.Cards, 1)},
+		StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
+		StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
+		StackType{HiddenCount: 5, Cards: make(gocards.Cards, 1)},
+		StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
+		StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
+		StackType{HiddenCount: 5, Cards: make(gocards.Cards, 1)},
+		StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
+		StackType{HiddenCount: 4, Cards: make(gocards.Cards, 1)},
+		StackType{HiddenCount: 5, Cards: make(gocards.Cards, 1)},
 	}
 	var hid = HiddenCards{
 		make(gocards.Cards, tab[0].HiddenCount),
@@ -70,7 +68,7 @@ func initialDeal(deck gocards.PlayableDeck) (types.Tableau, HiddenCards) {
 ROW_LOOP:
 	for {
 		var found bool
-		for col := 0; col < types.TableauWidth; col++ {
+		for col := 0; col < TableauWidth; col++ {
 			var ok bool
 			if row < tab[col].HiddenCount {
 				hid[col][row], ok = deck.Next()
@@ -93,4 +91,9 @@ ROW_LOOP:
 	}
 
 	return tab, hid
+}
+
+// IsValid returns true if the move is valid in the Tableau
+func (t Tableau) IsValid(m MoveType) bool {
+	return false
 }

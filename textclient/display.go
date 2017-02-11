@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/dougfort/arachne/types"
 	"github.com/dougfort/gocards"
 	"github.com/dougfort/gocards/standard"
+
+	"github.com/dougfort/arachne/game"
 )
 
 const displayCardBack = '🂠'
@@ -70,21 +71,21 @@ var (
 	}
 )
 
-func displayTableau(game gameData) {
+func displayTableau(g gameData) {
 	var row int
-	var image [types.TableauWidth]rune
+	var image [game.TableauWidth]rune
 
 ROW_LOOP:
 	for {
 		var found bool
-		for col := 0; col < types.TableauWidth; col++ {
-			if row < game.remote.Tableau[col].HiddenCount {
+		for col := 0; col < game.TableauWidth; col++ {
+			if row < g.remote.Tableau[col].HiddenCount {
 				image[col] = displayCardBack
 				found = true
 			} else {
-				visibleRow := row - game.remote.Tableau[col].HiddenCount
-				if visibleRow < len(game.remote.Tableau[col].Cards) {
-					image[col] = displayCards[game.remote.Tableau[col].Cards[visibleRow]]
+				visibleRow := row - g.remote.Tableau[col].HiddenCount
+				if visibleRow < len(g.remote.Tableau[col].Cards) {
+					image[col] = displayCards[g.remote.Tableau[col].Cards[visibleRow]]
 					found = true
 				} else {
 					image[col] = ' '
