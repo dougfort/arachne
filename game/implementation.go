@@ -92,8 +92,3 @@ ROW_LOOP:
 
 	return tab, hid
 }
-
-// IsValid returns true if the move is valid in the Tableau
-func (t Tableau) IsValid(m MoveType) bool {
-	return false
-}
