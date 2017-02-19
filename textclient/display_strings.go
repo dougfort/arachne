@@ -32,7 +32,7 @@ ROW_LOOP:
 		if !found {
 			break ROW_LOOP
 		}
-		fmt.Printf("%-17s %-17s %-17s %-17s %-17s %-17s %-17s %-17s %-17s %-17s\n",
+		fmt.Printf("%-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s\n",
 			image[0], image[1], image[2], image[3], image[4],
 			image[5], image[6], image[7], image[8], image[9],
 		)
