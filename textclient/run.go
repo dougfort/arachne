@@ -38,7 +38,7 @@ RUN_LOOP:
 				fmt.Printf("newGame failed: %s", err)
 				break RUN_LOOP
 			}
-			displayTableau(game)
+			displayTableauStrings(game)
 		case "quit":
 			fmt.Println("quitting")
 			break RUN_LOOP

@@ -8,31 +8,31 @@ import (
 	"github.com/dougfort/arachne/game"
 )
 
-func displayTableau(g gameData) {
+func displayTableauStrings(g gameData) {
 	var row int
-	var image [game.TableauWidth]rune
+	image := make([]string, game.TableauWidth)
 
 ROW_LOOP:
 	for {
 		var found bool
 		for col := 0; col < game.TableauWidth; col++ {
 			if row < g.remote.Tableau[col].HiddenCount {
-				image[col] = standard.RuneBack
+				image[col] = standard.StringBack
 				found = true
 			} else {
 				visibleRow := row - g.remote.Tableau[col].HiddenCount
 				if visibleRow < len(g.remote.Tableau[col].Cards) {
-					image[col] = standard.Runes[g.remote.Tableau[col].Cards[visibleRow]]
+					image[col] = standard.Strings[g.remote.Tableau[col].Cards[visibleRow]]
 					found = true
 				} else {
-					image[col] = ' '
+					image[col] = ""
 				}
 			}
 		}
 		if !found {
 			break ROW_LOOP
 		}
-		fmt.Printf("%c %c %c %c %c %c %c %c %c %c\n",
+		fmt.Printf("%-17s %-17s %-17s %-17s %-17s %-17s %-17s %-17s %-17s %-17s\n",
 			image[0], image[1], image[2], image[3], image[4],
 			image[5], image[6], image[7], image[8], image[9],
 		)
