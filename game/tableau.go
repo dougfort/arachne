@@ -5,6 +5,40 @@ import (
 	"github.com/dougfort/gocards"
 )
 
+// EnumerateMoves lists all possible legal moves in the current Tableau.
+// The returned slice is in no patricular order
+func (t Tableau) EnumerateMoves() []MoveType {
+	var moves []MoveType
+
+FROM_LOOP:
+	for from := 0; from < TableauWidth; from++ {
+		if len(t[from].Cards) == 0 {
+			continue FROM_LOOP
+		}
+
+	TO_LOOP:
+		for to := 0; to < TableauWidth; to++ {
+
+			if to == from {
+				continue TO_LOOP
+			}
+
+			// we could weed out a lot of these, but why bother, it would
+			// just make the code more confusing
+		ROW_LOOP:
+			for row := 0; row < len(t[from].Cards); row++ {
+				move := MoveType{FromCol: from, FromRow: row, ToCol: to}
+				if err := t.ValidateMove(move); err != nil {
+					continue ROW_LOOP
+				}
+				moves = append(moves, move)
+			}
+		}
+	}
+
+	return moves
+}
+
 // ValidateMove returns nil if the move is valid in the Tableau
 // A Move is valid if
 // 1. The slice of Cards at 'From' is all of the same Suit
