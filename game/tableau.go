@@ -23,10 +23,11 @@ FROM_LOOP:
 				continue TO_LOOP
 			}
 
-			// we could weed out a lot of these, but why bother, it would
-			// just make the code more confusing
+			// we could weed out a lot of these before validating,
+			// but why bother, it would just make the code more confusing
 		ROW_LOOP:
-			for row := 0; row < len(t[from].Cards); row++ {
+			for i := 0; i < len(t[from].Cards); i++ {
+				row := t[from].HiddenCount + i
 				move := MoveType{FromCol: from, FromRow: row, ToCol: to}
 				if err := t.ValidateMove(move); err != nil {
 					continue ROW_LOOP
@@ -76,11 +77,12 @@ func (t Tableau) getSliceToMove(m MoveType) (gocards.Cards, error) {
 		return nil, fmt.Errorf("m.FromCol invalid: %d", m.FromCol)
 	}
 
-	if !(m.FromRow >= 0 && m.FromRow < len(t[m.FromCol].Cards)) {
+	row := m.FromRow - t[m.FromCol].HiddenCount
+	if !(row >= 0 && row < len(t[m.FromCol].Cards)) {
 		return nil, fmt.Errorf("m.FromRow invalid: %d", m.FromRow)
 	}
 
-	s := t[m.FromCol].Cards[m.FromRow:]
+	s := t[m.FromCol].Cards[row:]
 
 	var prev gocards.Card
 	// interate from the top (highest Rank) card downto the bottom (lowest Rank)

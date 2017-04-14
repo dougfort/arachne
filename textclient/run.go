@@ -39,6 +39,10 @@ RUN_LOOP:
 				break RUN_LOOP
 			}
 			displayTableauStrings(game)
+		case "display":
+			displayTableauStrings(game)
+		case "scan":
+			displayMoves(game)
 		case "quit":
 			fmt.Println("quitting")
 			break RUN_LOOP
