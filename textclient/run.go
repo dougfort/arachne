@@ -5,12 +5,26 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 
-	"github.com/dougfort/arachne/game"
+	"github.com/pkg/errors"
+
+	gamelib "github.com/dougfort/arachne/game"
 )
 
+var (
+	moveRegex *regexp.Regexp
+)
+
+//
+func init() {
+	moveRegex = regexp.MustCompile(`^\D*(\d+), \D*(\d+)\D*(\d+)`)
+}
+
 type gameData struct {
-	remote game.Game // remote game
+	remote gamelib.Game // remote game
 }
 
 // run is the actual main body of the program
@@ -22,20 +36,24 @@ func run() int {
 
 	log.Printf("info: start")
 	fmt.Println("arachne starts")
-
-	scanner := bufio.NewScanner(os.Stdin)
-
 	fmt.Println("")
 	fmt.Printf(">")
 
+	scanner := bufio.NewScanner(os.Stdin)
 RUN_LOOP:
 	for scanner.Scan() {
 
-		switch scanner.Text() {
+		rawLine := scanner.Text()
+		splitLine := strings.SplitN(rawLine, " ", 2)
+		if len(splitLine) == 0 {
+			fmt.Println("unarsable command")
+			continue RUN_LOOP
+		}
+		switch splitLine[0] {
 		case "new":
 			fmt.Println("starting new game")
 			if game, err = newGame(); err != nil {
-				fmt.Printf("newGame failed: %s", err)
+				fmt.Printf("newGame failed: %s\n", err)
 				break RUN_LOOP
 			}
 			displayTableauStrings(game)
@@ -43,6 +61,17 @@ RUN_LOOP:
 			displayTableauStrings(game)
 		case "scan":
 			displayMoves(game)
+		case "move":
+			var move gamelib.MoveType
+			if move, err = parseMoveComand(splitLine); err != nil {
+				fmt.Printf("unparseable move command: %s\n", err)
+				continue RUN_LOOP
+			}
+			if err = processMove(game, move); err != nil {
+				fmt.Printf("unparseable move command: %s\n", err)
+				continue RUN_LOOP
+			}
+			displayTableauStrings(game)
 		case "quit":
 			fmt.Println("quitting")
 			break RUN_LOOP
@@ -55,4 +84,41 @@ RUN_LOOP:
 	log.Printf("info: end")
 
 	return exitCode
+}
+
+func parseMoveComand(splitLine []string) (gamelib.MoveType, error) {
+	var move gamelib.MoveType
+	var intVal int
+	var err error
+
+	if len(splitLine) < 2 {
+		return gamelib.MoveType{}, errors.Errorf("invalid line for move: '%q'",
+			splitLine)
+	}
+
+	parsedLine := moveRegex.FindStringSubmatch(splitLine[1])
+	if len(parsedLine) != 4 {
+		return gamelib.MoveType{}, errors.Errorf("unparseable line for move: '%s'",
+			splitLine[1])
+	}
+
+	if intVal, err = strconv.Atoi(parsedLine[1]); err != nil {
+		return gamelib.MoveType{}, errors.Wrapf(err, "invalid FromCol '%q'",
+			parsedLine)
+	}
+	move.FromCol = intVal - 1
+
+	if intVal, err = strconv.Atoi(parsedLine[2]); err != nil {
+		return gamelib.MoveType{}, errors.Wrapf(err, "invalid FromRow '%q'",
+			parsedLine)
+	}
+	move.FromRow = intVal - 1
+
+	if intVal, err = strconv.Atoi(parsedLine[3]); err != nil {
+		return gamelib.MoveType{}, errors.Wrapf(err, "invalid ToCol '%q'",
+			parsedLine)
+	}
+	move.ToCol = intVal - 1
+
+	return move, nil
 }
