@@ -1,7 +1,8 @@
 package game
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
+
 	"github.com/dougfort/gocards"
 )
 
@@ -54,13 +55,13 @@ func (t Tableau) ValidateMove(m MoveType) error {
 	}
 
 	if !stackIndexValid(m.ToCol) || m.ToCol == m.FromCol {
-		return fmt.Errorf("invalid ToCol: %d", m.FromCol)
+		return errors.Errorf("invalid ToCol: %d", m.FromCol)
 	}
 
 	if len(t[m.ToCol].Cards) > 0 {
 		bottomCard := t.getBottomCard(m.ToCol)
 		if s[0].Rank != bottomCard.Rank-1 {
-			return fmt.Errorf("Rank of move slice top (%d) does not fit ToCol bottom (%d)",
+			return errors.Errorf("Rank of move slice top (%d) does not fit ToCol bottom (%d)",
 				s[0].Rank, bottomCard.Rank)
 		}
 	}
@@ -74,12 +75,12 @@ func stackIndexValid(index int) bool {
 
 func (t Tableau) getSliceToMove(m MoveType) (gocards.Cards, error) {
 	if !stackIndexValid(m.FromCol) {
-		return nil, fmt.Errorf("m.FromCol invalid: %d", m.FromCol)
+		return nil, errors.Errorf("m.FromCol invalid: %d", m.FromCol)
 	}
 
 	row := m.FromRow - t[m.FromCol].HiddenCount
 	if !(row >= 0 && row < len(t[m.FromCol].Cards)) {
-		return nil, fmt.Errorf("m.FromRow invalid: %d", m.FromRow)
+		return nil, errors.Errorf("m.FromRow invalid: %d", m.FromRow)
 	}
 
 	s := t[m.FromCol].Cards[row:]
@@ -89,10 +90,10 @@ func (t Tableau) getSliceToMove(m MoveType) (gocards.Cards, error) {
 	for i, card := range s {
 		if i > 0 {
 			if card.Suit != prev.Suit {
-				return nil, fmt.Errorf("move slice not all the same Suit at %d", i)
+				return nil, errors.Errorf("move slice not all the same Suit at %d", i)
 			}
 			if card.Rank != prev.Rank-1 {
-				return nil, fmt.Errorf("move slice out of order %d %d at %d",
+				return nil, errors.Errorf("move slice out of order %d %d at %d",
 					prev.Rank, card.Rank, i)
 			}
 		}
