@@ -6,11 +6,11 @@ import (
 	gamelib "github.com/dougfort/arachne/game"
 )
 
-func processMove(g gameData, move gamelib.MoveType) error {
+func processMove(g gameData, m gamelib.MoveType) error {
 	var err error
 
-	if err = g.remote.Tableau.ValidateMove(move); err != nil {
-		return errors.Wrapf(err, "invalid move %s", move)
+	if err = g.remote.Move(m); err != nil {
+		return errors.Wrapf(err, "invalid move %s", m)
 	}
 
 	return nil

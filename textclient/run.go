@@ -24,7 +24,7 @@ func init() {
 }
 
 type gameData struct {
-	remote gamelib.Game // remote game
+	remote *gamelib.Game // remote game
 }
 
 // run is the actual main body of the program

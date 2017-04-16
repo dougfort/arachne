@@ -1,12 +1,13 @@
 package game
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/dougfort/gocards"
 )
 
-func TestGame(t *testing.T) {
+func TestNewGame(t *testing.T) {
 	var expectedHidden = [TableauWidth]int{5, 4, 4, 5, 4, 4, 5, 4, 4, 5}
 
 	cardCount := make(map[gocards.Card]int)
@@ -55,5 +56,44 @@ func TestGame(t *testing.T) {
 		if count > 2 {
 			t.Fatalf("too many %s cards: %d", card.Value(), count)
 		}
+	}
+}
+
+func TestGameMove(t *testing.T) {
+	testCases := []struct {
+		desc        string
+		before      Game
+		moves       []MoveType
+		after       Game
+		expectError bool
+	}{
+		{
+			desc: "single from, empty to",
+			before: Game{
+				Deck: nil,
+				Tableau: Tableau{
+					StackType{Cards: gocards.Cards{aceOfClubs}},
+				},
+			},
+			moves: []MoveType{
+				MoveType{FromCol: 0, FromRow: 0, ToCol: 1},
+			},
+			after: Game{
+				Deck: nil,
+				Tableau: Tableau{
+					StackType{},
+					StackType{Cards: gocards.Cards{aceOfClubs}},
+				},
+			},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%s expect error: %t", tc.desc, tc.expectError), func(t *testing.T) {
+			for _, move := range tc.moves {
+				if err := tc.before.Move(move); err != nil {
+					t.Fatalf("tc.before.Move(%s) failed: %s", move, err)
+				}
+			}
+		})
 	}
 }

@@ -54,19 +54,19 @@ func (t Tableau) ValidateMove(m MoveType) error {
 		return err
 	}
 
-	if !stackIndexValid(m.ToCol) || m.ToCol == m.FromCol {
+	if !toColValid(m) {
 		return errors.Errorf("invalid ToCol: %d", m.FromCol)
 	}
 
-	if len(t[m.ToCol].Cards) > 0 {
-		bottomCard := t.getBottomCard(m.ToCol)
-		if s[0].Rank != bottomCard.Rank-1 {
-			return errors.Errorf("Rank of move slice top (%d) does not fit ToCol bottom (%d)",
-				s[0].Rank, bottomCard.Rank)
-		}
+	if !t.moveCardsValid(m, s) {
+		return errors.Errorf("move slice does not fit ToCol")
 	}
 
 	return nil
+}
+
+func toColValid(m MoveType) bool {
+	return stackIndexValid(m.ToCol) && m.ToCol != m.FromCol
 }
 
 func stackIndexValid(index int) bool {
@@ -78,9 +78,9 @@ func (t Tableau) getSliceToMove(m MoveType) (gocards.Cards, error) {
 		return nil, errors.Errorf("m.FromCol invalid: %d", m.FromCol)
 	}
 
-	row := m.FromRow - t[m.FromCol].HiddenCount
+	row := t.computeCardsRow(m)
 	if !(row >= 0 && row < len(t[m.FromCol].Cards)) {
-		return nil, errors.Errorf("m.FromRow invalid: %d", m.FromRow)
+		return nil, errors.Errorf("computeCardsRow invalid: %s", m)
 	}
 
 	s := t[m.FromCol].Cards[row:]
@@ -101,6 +101,19 @@ func (t Tableau) getSliceToMove(m MoveType) (gocards.Cards, error) {
 	}
 
 	return s, nil
+}
+
+func (t Tableau) computeCardsRow(m MoveType) int {
+	return m.FromRow - t[m.FromCol].HiddenCount
+}
+
+func (t Tableau) moveCardsValid(m MoveType, s gocards.Cards) bool {
+	if len(t[m.ToCol].Cards) == 0 {
+		return true
+	}
+
+	bottomCard := t.getBottomCard(m.ToCol)
+	return s[0].Rank == bottomCard.Rank-1
 }
 
 func (t Tableau) getBottomCard(col int) gocards.Card {

@@ -1,6 +1,8 @@
 package game
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/dougfort/gocards"
 	"github.com/dougfort/gocards/standard"
 )
@@ -18,23 +20,20 @@ type Game struct {
 const deckCount = 2
 
 // New starts a new game
-func New() Game {
+func New() *Game {
 	var game Game
 
 	d := standard.NewDecks(deckCount)
 	game.Deck = d.Shuffle()
 	game.Tableau, game.HiddenCards = initialDeal(game.Deck)
 
-	return game
+	return &game
 }
 
 // initialDeal deals the cards the way a human would
 // returning the Tableau and HiddenCards
 // . . . . . . . . . .
 // . . . . . . . . . .
-// . . . . . . . . . .
-// . . . . . . . . . .
-// . X X . X X . X X .
 // X     X     X     X
 //
 // where '.' is a hidden card and 'X' is visible
@@ -91,4 +90,54 @@ ROW_LOOP:
 	}
 
 	return tab, hid
+}
+
+// Move takes a slice of cards from one Stack and appends it to another
+// If neccessary a hidden card will be exposed in the Stack from which the
+// move originates
+func (g *Game) Move(m MoveType) error {
+	var s gocards.Cards
+	var err error
+
+	if s, err = g.Tableau.getSliceToMove(m); err != nil {
+		return errors.Wrap(err, "getSliceToMove failed")
+	}
+
+	if !toColValid(m) {
+		return errors.Errorf("invalid ToCol: %d", m.FromCol)
+	}
+
+	if !toColValid(m) {
+		return errors.Errorf("invalid ToCol: %d", m.FromCol)
+	}
+	if !g.Tableau.moveCardsValid(m, s) {
+		return errors.Errorf("move slice does not fit ToCol")
+	}
+
+	g.Tableau[m.ToCol].Cards = append(g.Tableau[m.ToCol].Cards, s...)
+
+	// remove the cards from the 'From' stack
+	// if the From stack now has no visible cards
+	// bring in the outtermost hidden card
+	row := g.Tableau.computeCardsRow(m)
+	if !(row >= 0 && row < len(g.Tableau[m.FromCol].Cards)) {
+		return errors.Errorf("computeCardsRow invalid: %s", m)
+	}
+	g.Tableau[m.FromCol].Cards = g.Tableau[m.FromCol].Cards[:row]
+	if len(g.Tableau[m.FromCol].Cards) == 0 {
+		if g.Tableau[m.FromCol].HiddenCount > 0 {
+			if g.Tableau[m.FromCol].HiddenCount != len(g.HiddenCards[m.FromCol]) {
+				return errors.Errorf("hidden card mismatch %d != %d",
+					g.Tableau[m.FromCol].HiddenCount,
+					len(g.HiddenCards[m.FromCol]),
+				)
+			}
+			r := g.Tableau[m.FromCol].HiddenCount - 1
+			g.Tableau[m.FromCol].Cards = g.HiddenCards[m.FromCol][r:]
+			g.HiddenCards[m.FromCol] = g.HiddenCards[m.FromCol][:r]
+			g.Tableau[m.FromCol].HiddenCount--
+		}
+	}
+
+	return nil
 }

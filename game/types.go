@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/dougfort/gocards"
 )
 
@@ -28,4 +30,14 @@ type MoveType struct {
 
 	// TOCol is the index of the stack to which the move slice is appended
 	ToCol int
+}
+
+// String shows the move in human readable form
+// Note that displayed coordinates start at 1
+func (m MoveType) String() string {
+	return fmt.Sprintf("(%2d, %2d) -> %2d",
+		m.FromCol+1,
+		m.FromRow+1,
+		m.ToCol+1,
+	)
 }
