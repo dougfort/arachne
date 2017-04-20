@@ -37,7 +37,13 @@ func run() int {
 	log.Printf("info: start")
 	fmt.Println("arachne starts")
 	fmt.Println("")
-	fmt.Printf(">")
+	if game, err = newGame(); err != nil {
+		fmt.Printf("newGame failed: %s\n", err)
+		return -1
+	}
+	displayGameData(game)
+	fmt.Println("")
+	fmt.Print(">")
 
 	scanner := bufio.NewScanner(os.Stdin)
 RUN_LOOP:
@@ -56,7 +62,7 @@ RUN_LOOP:
 				fmt.Printf("newGame failed: %s\n", err)
 				break RUN_LOOP
 			}
-			displayTableauStrings(game)
+			displayGameData(game)
 		case "display":
 			displayTableauStrings(game)
 		case "scan":
@@ -71,10 +77,25 @@ RUN_LOOP:
 				fmt.Printf("unparseable move command: %s\n", err)
 				continue RUN_LOOP
 			}
-			displayTableauStrings(game)
+			displayGameData(game)
+		case "deal":
+			if game.remote.Deck.RemainingCards() == 0 {
+				fmt.Println("no cards available to deal")
+				continue RUN_LOOP
+			}
+			if game.remote.Tableau.EmptyStack() {
+				fmt.Println("cannot deal over empty stack")
+				continue RUN_LOOP
+			}
+			if err = game.remote.Deal(); err != nil {
+				fmt.Printf("deal failed: %s\n", err)
+				continue RUN_LOOP
+			}
+			displayGameData(game)
 		case "quit":
 			fmt.Println("quitting")
 			break RUN_LOOP
+
 		default:
 			fmt.Println("unknown command")
 		}
@@ -84,6 +105,14 @@ RUN_LOOP:
 	log.Printf("info: end")
 
 	return exitCode
+}
+
+func displayGameData(game gameData) {
+	fmt.Printf("cards remaining: %d\n", game.remote.Deck.RemainingCards())
+	fmt.Println("")
+	displayTableauStrings(game)
+	fmt.Println("")
+	displayMoves(game)
 }
 
 func parseMoveComand(splitLine []string) (gamelib.MoveType, error) {

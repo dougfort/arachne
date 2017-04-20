@@ -65,6 +65,16 @@ func (t Tableau) ValidateMove(m MoveType) error {
 	return nil
 }
 
+// EmptyStack returns true if the Tableau contains an empty Stack
+func (t Tableau) EmptyStack() bool {
+	for col := 0; col < TableauWidth; col++ {
+		if len(t[col].Cards) == 0 {
+			return true
+		}
+	}
+	return false
+}
+
 func toColValid(m MoveType) bool {
 	return stackIndexValid(m.ToCol) && m.ToCol != m.FromCol
 }

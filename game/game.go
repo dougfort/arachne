@@ -141,3 +141,16 @@ func (g *Game) Move(m MoveType) error {
 
 	return nil
 }
+
+// Deal appends a card to each stack
+func (g *Game) Deal() error {
+	for col := 0; col < TableauWidth; col++ {
+		card, ok := g.Deck.Next()
+		if !ok {
+			return errors.Errorf("deck exhausted")
+		}
+		g.Tableau[col].Cards = append(g.Tableau[col].Cards, card)
+	}
+
+	return nil
+}
