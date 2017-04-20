@@ -87,13 +87,42 @@ func TestGameMove(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%s expect error: %t", tc.desc, tc.expectError), func(t *testing.T) {
+			var err error
+		MOVE_LOOP:
 			for _, move := range tc.moves {
-				if err := tc.before.Move(move); err != nil {
+				if err = tc.before.Move(move); err != nil {
+					if tc.expectError {
+						break MOVE_LOOP
+					}
 					t.Fatalf("tc.before.Move(%s) failed: %s", move, err)
+				}
+			}
+			if err != nil {
+				if !tableausEqual(tc.before.Tableau, tc.after.Tableau) {
+					t.Fatalf("tableaux mismatch after move(s)")
 				}
 			}
 		})
 	}
+}
+
+func tableausEqual(t1, t2 Tableau) bool {
+	for i := 0; i < TableauWidth; i++ {
+		if len(t1[i].Cards) != len(t2[i].Cards) {
+			return false
+		}
+		if t1[i].HiddenCount != t2[i].HiddenCount {
+			return false
+		}
+		for j := 0; j < len(t1[i].Cards); j++ {
+			if !t1[i].Cards[j].Equal(t2[i].Cards[j]) {
+				return false
+			}
+		}
+	}
+
+	return true
 }
