@@ -107,10 +107,7 @@ func (g *Game) Move(m MoveType) error {
 		return errors.Errorf("invalid ToCol: %d", m.FromCol)
 	}
 
-	if !toColValid(m) {
-		return errors.Errorf("invalid ToCol: %d", m.FromCol)
-	}
-	if !g.Tableau.moveCardsValid(m, s) {
+	if _, ok := g.Tableau.evaluateMoveDest(m, s); !ok {
 		return errors.Errorf("move slice does not fit ToCol")
 	}
 
@@ -121,7 +118,7 @@ func (g *Game) Move(m MoveType) error {
 	// bring in the outtermost hidden card
 	row := g.Tableau.computeCardsRow(m)
 	if !(row >= 0 && row < len(g.Tableau[m.FromCol].Cards)) {
-		return errors.Errorf("computeCardsRow invalid: %s", m)
+		return errors.Errorf("computeCardsRow %d invalid: %s", row, m)
 	}
 	g.Tableau[m.FromCol].Cards = g.Tableau[m.FromCol].Cards[:row]
 	if len(g.Tableau[m.FromCol].Cards) == 0 {

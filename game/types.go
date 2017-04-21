@@ -41,3 +41,29 @@ func (m MoveType) String() string {
 		m.ToCol+1,
 	)
 }
+
+// EvaluatedMoveType is MoveType with evaluation
+type EvaluatedMoveType struct {
+	MoveType
+
+	// FromCount is the size of the slice to be moved from the origin
+	FromCount int
+
+	// ToCount is the number of Cards at the destination which have the same
+	// Suit as the incoming slice and which continue the Rank sequence.
+	// If the move is made, there will be FromCount + ToCount Cards avaialble
+	// to move from the destination
+	ToCount int
+}
+
+// String shows the move in human readable form
+// Note that displayed coordinates start at 1
+func (m EvaluatedMoveType) String() string {
+	return fmt.Sprintf("(%2d, %2d) -> %2d: from: %d + to: %d",
+		m.FromCol+1,
+		m.FromRow+1,
+		m.ToCol+1,
+		m.FromCount,
+		m.ToCount,
+	)
+}

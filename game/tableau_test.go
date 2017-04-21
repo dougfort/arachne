@@ -7,7 +7,7 @@ import (
 	"github.com/dougfort/gocards"
 )
 
-type moveSet map[MoveType]struct{}
+type moveSet map[EvaluatedMoveType]struct{}
 
 var (
 	testTableaus = []Tableau{
@@ -74,7 +74,7 @@ func TestValidateMove(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%s %t", tc.desc, tc.expectValid), func(t *testing.T) {
-			err := tc.tab.ValidateMove(tc.move)
+			_, err := tc.tab.EvaluateMove(tc.move)
 			if tc.expectValid && err != nil {
 				t.Fatalf("expected valid move: %s", err)
 			}
@@ -89,65 +89,65 @@ func TestEnumerateMoves(t *testing.T) {
 	testCases := []struct {
 		desc          string
 		tab           Tableau
-		expectedMoves []MoveType
+		expectedMoves []EvaluatedMoveType
 	}{
 		{"empty tableau", testTableaus[0], nil},
-		{"move to empty stack", testTableaus[1], []MoveType{
-			MoveType{0, 0, 1},
-			MoveType{0, 0, 2},
-			MoveType{0, 0, 3},
-			MoveType{0, 0, 4},
-			MoveType{0, 0, 5},
-			MoveType{0, 0, 6},
-			MoveType{0, 0, 7},
-			MoveType{0, 0, 8},
-			MoveType{0, 0, 9},
+		{"move to empty stack", testTableaus[1], []EvaluatedMoveType{
+			EvaluatedMoveType{MoveType{0, 0, 1}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 2}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 3}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 4}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 5}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 6}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 7}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 8}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 9}, 1, 0},
 		}},
-		{"move to right Rank", testTableaus[2], []MoveType{
-			MoveType{0, 0, 1},
-			MoveType{0, 0, 2},
-			MoveType{0, 0, 3},
-			MoveType{0, 0, 4},
-			MoveType{0, 0, 5},
-			MoveType{0, 0, 6},
-			MoveType{0, 0, 7},
-			MoveType{0, 0, 8},
-			MoveType{0, 0, 9},
-			MoveType{1, 0, 2},
-			MoveType{1, 0, 3},
-			MoveType{1, 0, 4},
-			MoveType{1, 0, 5},
-			MoveType{1, 0, 6},
-			MoveType{1, 0, 7},
-			MoveType{1, 0, 8},
-			MoveType{1, 0, 9},
+		{"move to right Rank", testTableaus[2], []EvaluatedMoveType{
+			EvaluatedMoveType{MoveType{0, 0, 1}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 2}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 3}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 4}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 5}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 6}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 7}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 8}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 0, 9}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 2}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 3}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 4}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 5}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 6}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 7}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 8}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 9}, 1, 0},
 		}},
-		{"move to valid card", testTableaus[6], []MoveType{
-			MoveType{0, 0, 1},
-			MoveType{0, 0, 2},
-			MoveType{0, 0, 3},
-			MoveType{0, 0, 4},
-			MoveType{0, 0, 5},
-			MoveType{0, 0, 6},
-			MoveType{0, 0, 7},
-			MoveType{0, 0, 8},
-			MoveType{0, 0, 9},
-			MoveType{0, 1, 2},
-			MoveType{0, 1, 3},
-			MoveType{0, 1, 4},
-			MoveType{0, 1, 5},
-			MoveType{0, 1, 6},
-			MoveType{0, 1, 7},
-			MoveType{0, 1, 8},
-			MoveType{0, 1, 9},
-			MoveType{1, 0, 2},
-			MoveType{1, 0, 3},
-			MoveType{1, 0, 4},
-			MoveType{1, 0, 5},
-			MoveType{1, 0, 6},
-			MoveType{1, 0, 7},
-			MoveType{1, 0, 8},
-			MoveType{1, 0, 9},
+		{"move to valid card", testTableaus[6], []EvaluatedMoveType{
+			EvaluatedMoveType{MoveType{0, 0, 1}, 2, 1},
+			EvaluatedMoveType{MoveType{0, 0, 2}, 2, 0},
+			EvaluatedMoveType{MoveType{0, 0, 3}, 2, 0},
+			EvaluatedMoveType{MoveType{0, 0, 4}, 2, 0},
+			EvaluatedMoveType{MoveType{0, 0, 5}, 2, 0},
+			EvaluatedMoveType{MoveType{0, 0, 6}, 2, 0},
+			EvaluatedMoveType{MoveType{0, 0, 7}, 2, 0},
+			EvaluatedMoveType{MoveType{0, 0, 8}, 2, 0},
+			EvaluatedMoveType{MoveType{0, 0, 9}, 2, 0},
+			EvaluatedMoveType{MoveType{0, 1, 2}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 1, 3}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 1, 4}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 1, 5}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 1, 6}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 1, 7}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 1, 8}, 1, 0},
+			EvaluatedMoveType{MoveType{0, 1, 9}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 2}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 3}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 4}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 5}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 6}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 7}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 8}, 1, 0},
+			EvaluatedMoveType{MoveType{1, 0, 9}, 1, 0},
 		}},
 	}
 	for _, tc := range testCases {
@@ -163,9 +163,9 @@ func TestEnumerateMoves(t *testing.T) {
 }
 
 // compareMoves returns (moves in m1 not in m2, moves in m2 not in m1)
-func compareMoves(m1, m2 []MoveType) (moveSet, moveSet) {
-	s1 := make(map[MoveType]struct{})
-	s2 := make(map[MoveType]struct{})
+func compareMoves(m1, m2 []EvaluatedMoveType) (moveSet, moveSet) {
+	s1 := make(map[EvaluatedMoveType]struct{})
+	s2 := make(map[EvaluatedMoveType]struct{})
 
 	for _, m := range m1 {
 		s1[m] = struct{}{}
@@ -186,8 +186,9 @@ func compareMoves(m1, m2 []MoveType) (moveSet, moveSet) {
 	return s1, s2
 }
 
-func moveString(m MoveType) string {
-	return fmt.Sprintf("[(%d,%d)->%d]", m.FromCol, m.FromRow, m.ToCol)
+func moveString(m EvaluatedMoveType) string {
+	return fmt.Sprintf("[%s: from: %d, to: %d]",
+		m.MoveType, m.FromCount, m.ToCount)
 }
 
 func moveSetStrings(s moveSet) []string {
