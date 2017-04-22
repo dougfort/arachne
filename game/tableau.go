@@ -27,19 +27,33 @@ FROM_LOOP:
 				continue TO_LOOP
 			}
 
-			// we could weed out a lot of these before validating,
-			// but why bother, it would just make the code more confusing
-		ROW_LOOP:
-			for i := 0; i < len(t[from].Cards); i++ {
-				var evaluatedMove EvaluatedMoveType
+			// start with the bottom Card of the Stack
+			highIndex := len(t[from].Cards) - 1
+			highCard := t[from].Cards[highIndex]
 
-				row := t[from].HiddenCount + i
-				move := MoveType{FromCol: from, FromRow: row, ToCol: to}
-				if evaluatedMove, err = t.EvaluateMove(move); err != nil {
-					continue ROW_LOOP
+		RUN_LOOP:
+			// Look from bottom up for a run of Cards:
+			// same Suit in order by Rank.
+			// The run could be a single card.
+			for i := len(t[from].Cards) - 2; i >= 0; i-- {
+				card := t[from].Cards[i]
+				if card.Suit != highCard.Suit {
+					break RUN_LOOP
 				}
-				moves = append(moves, evaluatedMove)
+				if card.Rank != highCard.Rank+1 {
+					break RUN_LOOP
+				}
+				highIndex = i
+				highCard = card
 			}
+			var evaluatedMove EvaluatedMoveType
+
+			row := t[from].HiddenCount + highIndex
+			move := MoveType{FromCol: from, FromRow: row, ToCol: to}
+			if evaluatedMove, err = t.EvaluateMove(move); err != nil {
+				continue TO_LOOP
+			}
+			moves = append(moves, evaluatedMove)
 		}
 	}
 
