@@ -20,7 +20,7 @@ var (
 
 //
 func init() {
-	moveRegex = regexp.MustCompile(`^\D*(\d+)\s*, \D*(\d+)\D*(\d+)`)
+	moveRegex = regexp.MustCompile(`^\D*(\d+)\s*,\s*\D*(\d+)\D*(\d+)`)
 }
 
 type gameData struct {
