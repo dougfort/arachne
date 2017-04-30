@@ -1,4 +1,4 @@
 /*package main
-arachneserv is a RESTful server for arachne games
+arachneserv is a gRpc server for arachne games
 */
 package main
