@@ -27,23 +27,40 @@ func (s *arachneServer) StartGame(
 	ctx context.Context,
 	request *pb.GameRequest,
 ) (*pb.Game, error) {
-	var gm pb.Game
+	var localGame *game.Game
+	var pbGame pb.Game
 
-	gm.Id = s.nextID
+	pbGame.Id = s.nextID
 	s.nextID++
 
 	switch request.Gametype {
 	case pb.GameRequest_RANDOM:
-		s.active[gm.Id] = game.New()
+		localGame = game.New()
 	case pb.GameRequest_REPLAY:
-		s.active[gm.Id] = game.Replay(request.Seed)
+		localGame = game.Replay(request.Seed)
 	default:
 		return nil, fmt.Errorf("invalid GameType %d", request.Gametype)
 	}
 
-	gm.Seed = s.active[gm.Id].Deck.Seed()
+	pbGame.Seed = localGame.Deck.Seed()
+	pbGame.Stack = make([]*pb.Stack, game.TableauWidth)
+	for i := 0; i < game.TableauWidth; i++ {
+		pbGame.Stack[i] = new(pb.Stack)
+		pbGame.Stack[i].HiddenCount = int32(localGame.Tableau[i].HiddenCount)
+		cardsLen := len(localGame.Tableau[i].Cards)
+		pbGame.Stack[i].Cards = make([]*pb.Card, cardsLen)
+		for j := 0; j < cardsLen; j++ {
+			localCard := localGame.Tableau[i].Cards[j]
+			pbGame.Stack[i].Cards[j] =
+				&pb.Card{
+					Suit: int32(localCard.Suit),
+					Rank: int32(localCard.Rank),
+				}
+		}
+	}
 
-	return &gm, nil
+	s.active[pbGame.Id] = localGame
+	return &pbGame, nil
 }
 
 func newServer() *arachneServer {
