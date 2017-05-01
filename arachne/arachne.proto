@@ -14,6 +14,14 @@ service Arachne {
 }
 
 message GameRequest {
+    enum GameType {
+        RANDOM = 0;
+        REPLAY = 1;
+      }
+      GameType gametype = 1;
+
+      // seed declares the game to be replayed when GameType is REPLAY
+      int64 seed = 2;
 }
 
 message Game {

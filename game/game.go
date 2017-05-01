@@ -30,6 +30,17 @@ func New() *Game {
 	return &game
 }
 
+// Replay a game for a specific seed
+func Replay(seed int64) *Game {
+	var game Game
+
+	d := standard.NewDecks(deckCount)
+	game.Deck = d.SeededShuffle(seed)
+	game.Tableau, game.HiddenCards = initialDeal(game.Deck)
+
+	return &game
+}
+
 // initialDeal deals the cards the way a human would
 // returning the Tableau and HiddenCards
 // . . . . . . . . . .

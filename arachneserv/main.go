@@ -10,12 +10,16 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
+	"github.com/dougfort/arachne/game"
+
 	pb "github.com/dougfort/arachne/arachne"
 )
 
 const port = 10000
 
 type arachneServer struct {
+	nextID int64
+	active map[int64]*game.Game
 }
 
 // StartGame starts a new game
@@ -23,12 +27,30 @@ func (s *arachneServer) StartGame(
 	ctx context.Context,
 	request *pb.GameRequest,
 ) (*pb.Game, error) {
-	return &pb.Game{Id: 666, Seed: 42}, nil
+	var gm pb.Game
+
+	gm.Id = s.nextID
+	s.nextID++
+
+	switch request.Gametype {
+	case pb.GameRequest_RANDOM:
+		s.active[gm.Id] = game.New()
+	case pb.GameRequest_REPLAY:
+		s.active[gm.Id] = game.Replay(request.Seed)
+	default:
+		return nil, fmt.Errorf("invalid GameType %d", request.Gametype)
+	}
+
+	gm.Seed = s.active[gm.Id].Deck.Seed()
+
+	return &gm, nil
 }
 
 func newServer() *arachneServer {
-	s := new(arachneServer)
-	return s
+	var s arachneServer
+	s.nextID = 1
+	s.active = make(map[int64]*game.Game)
+	return &s
 }
 
 func main() {
