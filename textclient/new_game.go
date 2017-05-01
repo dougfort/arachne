@@ -7,14 +7,11 @@ import (
 	"google.golang.org/grpc/grpclog"
 
 	pb "github.com/dougfort/arachne/arachne"
-
-	"github.com/dougfort/arachne/game"
 )
 
 const serverAddr = "127.0.0.1:10000"
 
-func newGame() (gameData, error) {
-	var g gameData
+func newGame() (*pb.Game, error) {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
 	conn, err := grpc.Dial(serverAddr, opts...)
@@ -28,8 +25,6 @@ func newGame() (gameData, error) {
 	if err != nil {
 		grpclog.Fatalf("%v.GetFeatures(_) = _, %v: ", client, err)
 	}
-	grpclog.Println(gm)
 
-	g.remote = game.New()
-	return g, nil
+	return gm, nil
 }

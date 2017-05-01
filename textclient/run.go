@@ -6,12 +6,9 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	gamelib "github.com/dougfort/arachne/game"
+	pb "github.com/dougfort/arachne/arachne"
 )
 
 var (
@@ -23,16 +20,12 @@ func init() {
 	moveRegex = regexp.MustCompile(`^\D*(\d+)\s*,\s*\D*(\d+)\D*(\d+)`)
 }
 
-type gameData struct {
-	remote *gamelib.Game // remote game
-}
-
 // run is the actual main body of the program
 // it returns an exit code to main
 func run() int {
 	var err error
 	var exitCode int
-	var game gameData
+	var game *pb.Game
 
 	log.Printf("info: start")
 	fmt.Println("arachne starts")
@@ -65,33 +58,35 @@ RUN_LOOP:
 			displayGameData(game)
 		case "display":
 			displayTableauStrings(game)
-		case "scan":
-			displayMoves(game)
-		case "move":
-			var move gamelib.MoveType
-			if move, err = parseMoveComand(splitLine); err != nil {
-				fmt.Printf("unparseable move command: %s\n", err)
-				continue RUN_LOOP
-			}
-			if err = processMove(game, move); err != nil {
-				fmt.Printf("unparseable move command: %s\n", err)
-				continue RUN_LOOP
-			}
-			displayGameData(game)
-		case "deal":
-			if game.remote.Deck.RemainingCards() == 0 {
-				fmt.Println("no cards available to deal")
-				continue RUN_LOOP
-			}
-			if game.remote.Tableau.EmptyStack() {
-				fmt.Println("cannot deal over empty stack")
-				continue RUN_LOOP
-			}
-			if err = game.remote.Deal(); err != nil {
-				fmt.Printf("deal failed: %s\n", err)
-				continue RUN_LOOP
-			}
-			displayGameData(game)
+			/*
+				case "scan":
+					displayMoves(game)
+				case "move":
+					var move gamelib.MoveType
+					if move, err = parseMoveComand(splitLine); err != nil {
+						fmt.Printf("unparseable move command: %s\n", err)
+						continue RUN_LOOP
+					}
+					if err = processMove(game, move); err != nil {
+						fmt.Printf("unparseable move command: %s\n", err)
+						continue RUN_LOOP
+					}
+					displayGameData(game)
+				case "deal":
+					if game.remote.Deck.RemainingCards() == 0 {
+						fmt.Println("no cards available to deal")
+						continue RUN_LOOP
+					}
+					if game.remote.Tableau.EmptyStack() {
+						fmt.Println("cannot deal over empty stack")
+						continue RUN_LOOP
+					}
+					if err = game.remote.Deal(); err != nil {
+						fmt.Printf("deal failed: %s\n", err)
+						continue RUN_LOOP
+					}
+					displayGameData(game)
+			*/
 		case "quit":
 			fmt.Println("quitting")
 			break RUN_LOOP
@@ -107,14 +102,15 @@ RUN_LOOP:
 	return exitCode
 }
 
-func displayGameData(game gameData) {
-	fmt.Printf("cards remaining: %d\n", game.remote.Deck.RemainingCards())
+func displayGameData(game *pb.Game) {
+	fmt.Printf("cards remaining: %d\n", 666)
 	fmt.Println("")
 	displayTableauStrings(game)
 	fmt.Println("")
 	displayMoves(game)
 }
 
+/*
 func parseMoveComand(splitLine []string) (gamelib.MoveType, error) {
 	var move gamelib.MoveType
 	var intVal int
@@ -151,3 +147,4 @@ func parseMoveComand(splitLine []string) (gamelib.MoveType, error) {
 
 	return move, nil
 }
+*/

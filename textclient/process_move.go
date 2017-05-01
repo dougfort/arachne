@@ -1,11 +1,6 @@
 package main
 
-import (
-	"github.com/pkg/errors"
-
-	gamelib "github.com/dougfort/arachne/game"
-)
-
+/*
 func processMove(g gameData, m gamelib.MoveType) error {
 	var err error
 
@@ -15,3 +10,4 @@ func processMove(g gameData, m gamelib.MoveType) error {
 
 	return nil
 }
+*/
