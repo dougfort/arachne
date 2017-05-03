@@ -6,9 +6,14 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/dougfort/arachne/client"
+
+	gamelib "github.com/dougfort/arachne/game"
 )
 
 var (
@@ -64,37 +69,38 @@ RUN_LOOP:
 			displayGameData(lg)
 		case "display":
 			displayTableauStrings(lg.Tableau)
-			/*
-				case "scan":
-					displayMoves(game)
-				case "move":
-					var move gamelib.MoveType
-					if move, err = parseMoveComand(splitLine); err != nil {
-						fmt.Printf("unparseable move command: %s\n", err)
-						continue RUN_LOOP
-					}
-					if err = processMove(game, move); err != nil {
-						fmt.Printf("unparseable move command: %s\n", err)
-						continue RUN_LOOP
-					}
-					displayGameData(game)
-				case "deal":
-					if game.remote.Deck.RemainingCards() == 0 {
-						fmt.Println("no cards available to deal")
-						continue RUN_LOOP
-					}
-					if game.remote.Tableau.EmptyStack() {
-						fmt.Println("cannot deal over empty stack")
-						continue RUN_LOOP
-					}
-					if err = game.remote.Deal(); err != nil {
-						fmt.Printf("deal failed: %s\n", err)
-						continue RUN_LOOP
-					}
-					displayGameData(game)
-			*/
+		case "scan":
+			displayMoves(lg.Tableau)
+		case "move":
+			var move gamelib.MoveType
+			if move, err = parseMoveComand(splitLine); err != nil {
+				fmt.Printf("unparseable move command: %s\n", err)
+				continue RUN_LOOP
+			}
+			if lg, err = c.Move(move); err != nil {
+				fmt.Printf("move failed: %s\n", err)
+				continue RUN_LOOP
+			}
+			displayGameData(lg)
+		case "deal":
+			if lg.CardsRemaining == 0 {
+				fmt.Println("no cards available to deal")
+				continue RUN_LOOP
+			}
+			if lg.Tableau.EmptyStack() {
+				fmt.Println("cannot deal over empty stack")
+				continue RUN_LOOP
+			}
+			if lg, err = c.Deal(); err != nil {
+				fmt.Printf("deal failed: %v\n", err)
+				continue RUN_LOOP
+			}
+			displayGameData(lg)
 		case "quit":
 			fmt.Println("quitting")
+			if err := c.Close(); err != nil {
+				fmt.Printf("Close failed: %v\n", err)
+			}
 			break RUN_LOOP
 
 		default:
@@ -118,7 +124,6 @@ func displayGameData(lg client.LocalGame) {
 	displayMoves(lg.Tableau)
 }
 
-/*
 func parseMoveComand(splitLine []string) (gamelib.MoveType, error) {
 	var move gamelib.MoveType
 	var intVal int
@@ -155,4 +160,3 @@ func parseMoveComand(splitLine []string) (gamelib.MoveType, error) {
 
 	return move, nil
 }
-*/

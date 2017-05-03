@@ -21,7 +21,7 @@ func (s *arachneServer) RequestMove(
 	var pbGame pb.Game
 	var ok bool
 
-	move.FromCol = int(request.FromRow)
+	move.FromCol = int(request.FromCol)
 	move.FromRow = int(request.FromRow)
 	move.ToCol = int(request.ToCol)
 

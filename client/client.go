@@ -13,6 +13,7 @@ import (
 	"github.com/dougfort/gocards"
 )
 
+// LocalGame is the client's representation of the state of the game
 type LocalGame struct {
 	Tableau        game.Tableau
 	CardsRemaining int
@@ -27,6 +28,15 @@ type Client interface {
 
 	// ReplayGame requests a new game with a known seed
 	ReplayGame(seed int64) (LocalGame, error)
+
+	// Move a card or cards from one stack to another
+	Move(move game.MoveType) (LocalGame, error)
+
+	// Deal the next round of cards
+	Deal() (LocalGame, error)
+
+	// EndGame stops the current game on the server
+	EndGame() error
 
 	// Close closes the server connection and releasess all resources
 	Close() error
@@ -70,6 +80,8 @@ func (c *clientImpl) NewGame() (LocalGame, error) {
 		return LocalGame{}, errors.Wrap(err, "NewGame()")
 	}
 
+	c.gameID = pbGame.Id
+
 	lg.Seed = pbGame.Seed
 	lg.CardsRemaining = int(pbGame.CardsRemaining)
 
@@ -97,6 +109,8 @@ func (c *clientImpl) ReplayGame(seed int64) (LocalGame, error) {
 		return LocalGame{}, errors.Wrap(err, "ReplayGame()")
 	}
 
+	c.gameID = pbGame.Id
+
 	lg.CardsRemaining = int(pbGame.CardsRemaining)
 
 	if lg.Tableau, err = pb2arachne(pbGame); err != nil {
@@ -104,6 +118,74 @@ func (c *clientImpl) ReplayGame(seed int64) (LocalGame, error) {
 	}
 
 	return lg, nil
+}
+
+// Move a card or cards from one stack to another
+func (c *clientImpl) Move(move game.MoveType) (LocalGame, error) {
+	var pbGame *pb.Game
+	var lg LocalGame
+	var err error
+
+	pbGame, err = c.pbClient.RequestMove(
+		context.Background(),
+		&pb.MoveRequest{
+			Id:      c.gameID,
+			FromCol: int32(move.FromCol),
+			FromRow: int32(move.FromRow),
+			ToCol:   int32(move.ToCol),
+		},
+	)
+	if err != nil {
+		return LocalGame{}, errors.Wrap(err, "RequestMove()")
+	}
+
+	lg.CardsRemaining = int(pbGame.CardsRemaining)
+	lg.Seed = pbGame.Seed
+
+	if lg.Tableau, err = pb2arachne(pbGame); err != nil {
+		return LocalGame{}, errors.Wrap(err, "pb2arachne")
+	}
+
+	return lg, nil
+}
+
+// Deal the next round of cards
+func (c *clientImpl) Deal() (LocalGame, error) {
+	var pbGame *pb.Game
+	var lg LocalGame
+	var err error
+
+	pbGame, err = c.pbClient.RequestDeal(
+		context.Background(),
+		&pb.DealRequest{Id: c.gameID},
+	)
+	if err != nil {
+		return LocalGame{}, errors.Wrap(err, "RequestDeal()")
+	}
+
+	lg.CardsRemaining = int(pbGame.CardsRemaining)
+	lg.Seed = pbGame.Seed
+
+	if lg.Tableau, err = pb2arachne(pbGame); err != nil {
+		return LocalGame{}, errors.Wrap(err, "pb2arachne")
+	}
+
+	return lg, nil
+}
+
+// EndGame stops the current game on the server
+func (c *clientImpl) EndGame() error {
+	var err error
+
+	_, err = c.pbClient.EndGame(
+		context.Background(),
+		&pb.EndGameRequest{Id: c.gameID},
+	)
+	if err != nil {
+		return errors.Wrap(err, "EndGame()")
+	}
+
+	return nil
 }
 
 // Close closes the server connection and releasess all resources
