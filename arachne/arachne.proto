@@ -11,6 +11,15 @@ service Arachne {
 
     // StartGame starts a new game
     rpc StartGame(GameRequest) returns (Game) {}
+        
+    // RequestMove requests a move of cards
+    rpc RequestMove(MoveRequest) returns (Game) {}
+
+    // RequestDeal requests a deal
+    rpc RequestDeal(DealRequest) returns (Game) {}
+
+    // EndGame requests the end of a game
+    rpc EndGame(EndGameRequest) returns (EndGameResponse) {}
 }
 
 message GameRequest {
@@ -41,3 +50,20 @@ message Card {
     int32 suit = 1;
     int32 rank = 2;
 }
+
+message MoveRequest {
+    int64 id = 1;
+    int32 fromCol = 2;
+    int32 fromRow = 3;
+    int32 toCol = 4;
+}
+
+message DealRequest {
+    int64 id = 1;
+}
+
+message EndGameRequest {
+    int64 id = 1;
+}
+
+message EndGameResponse {}
