@@ -3,87 +3,88 @@ package main
 import (
 	"fmt"
 
-	pb "github.com/dougfort/arachne/arachne"
+	"github.com/dougfort/arachne/game"
+
+	"github.com/dougfort/gocards"
+	"github.com/dougfort/gocards/standard"
 )
 
-func displayTableauStrings(g *pb.Game) {
+func displayTableauStrings(t game.Tableau) {
 	const stringBack = "(.....)"
-	cardStrings := map[pb.Card]string{
-		pb.Card{Suit: 1, Rank: 1}:  "(C,  A)",
-		pb.Card{Suit: 1, Rank: 2}:  "(C,  2)",
-		pb.Card{Suit: 1, Rank: 3}:  "(C,  3)",
-		pb.Card{Suit: 1, Rank: 4}:  "(C,  4)",
-		pb.Card{Suit: 1, Rank: 5}:  "(C,  5)",
-		pb.Card{Suit: 1, Rank: 6}:  "(C,  6)",
-		pb.Card{Suit: 1, Rank: 7}:  "(C,  7)",
-		pb.Card{Suit: 1, Rank: 8}:  "(C,  8)",
-		pb.Card{Suit: 1, Rank: 9}:  "(C,  9)",
-		pb.Card{Suit: 1, Rank: 10}: "(C, 10)",
-		pb.Card{Suit: 1, Rank: 11}: "(C,  J)",
-		pb.Card{Suit: 1, Rank: 12}: "(C,  Q)",
-		pb.Card{Suit: 1, Rank: 13}: "(C,  K)",
-		pb.Card{Suit: 2, Rank: 1}:  "(D,  A)",
-		pb.Card{Suit: 2, Rank: 2}:  "(D,  2)",
-		pb.Card{Suit: 2, Rank: 3}:  "(D,  3)",
-		pb.Card{Suit: 2, Rank: 4}:  "(D,  4)",
-		pb.Card{Suit: 2, Rank: 5}:  "(D,  5)",
-		pb.Card{Suit: 2, Rank: 6}:  "(D,  6)",
-		pb.Card{Suit: 2, Rank: 7}:  "(D,  7)",
-		pb.Card{Suit: 2, Rank: 8}:  "(D,  8)",
-		pb.Card{Suit: 2, Rank: 9}:  "(D,  9)",
-		pb.Card{Suit: 2, Rank: 10}: "(D, 10)",
-		pb.Card{Suit: 2, Rank: 11}: "(D,  J)",
-		pb.Card{Suit: 2, Rank: 12}: "(D,  Q)",
-		pb.Card{Suit: 2, Rank: 13}: "(D,  K)",
-		pb.Card{Suit: 3, Rank: 1}:  "(H,  A)",
-		pb.Card{Suit: 3, Rank: 2}:  "(H,  2)",
-		pb.Card{Suit: 3, Rank: 3}:  "(H,  3)",
-		pb.Card{Suit: 3, Rank: 4}:  "(H,  4)",
-		pb.Card{Suit: 3, Rank: 5}:  "(H,  5)",
-		pb.Card{Suit: 3, Rank: 6}:  "(H,  6)",
-		pb.Card{Suit: 3, Rank: 7}:  "(H,  7)",
-		pb.Card{Suit: 3, Rank: 8}:  "(H,  8)",
-		pb.Card{Suit: 3, Rank: 9}:  "(H,  9)",
-		pb.Card{Suit: 3, Rank: 10}: "(H, 10)",
-		pb.Card{Suit: 3, Rank: 11}: "(H,  J)",
-		pb.Card{Suit: 3, Rank: 12}: "(H,  Q)",
-		pb.Card{Suit: 3, Rank: 13}: "(H,  K)",
-		pb.Card{Suit: 4, Rank: 1}:  "(S,  A)",
-		pb.Card{Suit: 4, Rank: 2}:  "(S,  2)",
-		pb.Card{Suit: 4, Rank: 3}:  "(S,  3)",
-		pb.Card{Suit: 4, Rank: 4}:  "(S,  4)",
-		pb.Card{Suit: 4, Rank: 5}:  "(S,  5)",
-		pb.Card{Suit: 4, Rank: 6}:  "(S,  6)",
-		pb.Card{Suit: 4, Rank: 7}:  "(S,  7)",
-		pb.Card{Suit: 4, Rank: 8}:  "(S,  8)",
-		pb.Card{Suit: 4, Rank: 9}:  "(S,  9)",
-		pb.Card{Suit: 4, Rank: 10}: "(S, 10)",
-		pb.Card{Suit: 4, Rank: 11}: "(S,  J)",
-		pb.Card{Suit: 4, Rank: 12}: "(S,  Q)",
-		pb.Card{Suit: 4, Rank: 13}: "(S,  K)",
+	cardStrings := map[gocards.Card]string{
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Ace}:      "(C,  A)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Two}:      "(C,  2)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Three}:    "(C,  3)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Four}:     "(C,  4)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Five}:     "(C,  5)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Six}:      "(C,  6)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Seven}:    "(C,  7)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Eight}:    "(C,  8)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Nine}:     "(C,  9)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Ten}:      "(C, 10)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Jack}:     "(C,  J)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.Queen}:    "(C,  Q)",
+		gocards.Card{Suit: standard.Clubs, Rank: standard.King}:     "(C,  K)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Ace}:   "(D,  A)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Two}:   "(D,  2)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Three}: "(D,  3)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Four}:  "(D,  4)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Five}:  "(D,  5)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Six}:   "(D,  6)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Seven}: "(D,  7)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Eight}: "(D,  8)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Nine}:  "(D,  9)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Ten}:   "(D, 10)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Jack}:  "(D,  J)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.Queen}: "(D,  Q)",
+		gocards.Card{Suit: standard.Diamonds, Rank: standard.King}:  "(D,  K)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Ace}:     "(H,  A)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Two}:     "(H,  2)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Three}:   "(H,  3)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Four}:    "(H,  4)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Five}:    "(H,  5)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Six}:     "(H,  6)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Seven}:   "(H,  7)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Eight}:   "(H,  8)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Nine}:    "(H,  9)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Ten}:     "(H, 10)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Jack}:    "(H,  J)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Queen}:   "(H,  Q)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.King}:    "(H,  K)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Ace}:     "(S,  A)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Two}:     "(S,  2)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Three}:   "(S,  3)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Four}:    "(S,  4)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Five}:    "(S,  5)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Six}:     "(S,  6)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Seven}:   "(S,  7)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Eight}:   "(S,  8)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Nine}:    "(S,  9)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Ten}:     "(S, 10)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Jack}:    "(S,  J)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.Queen}:   "(S,  Q)",
+		gocards.Card{Suit: standard.Spades, Rank: standard.King}:    "(S,  K)",
 	}
 
-	var row int32
-	var col int32
-
-	tableauWidth := len(g.GetStack())
-	image := make([]string, tableauWidth)
+	image := make([]string, game.TableauWidth)
 
 	fmt.Printf("   %-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s\n",
 		"   1", "   2", "   3", "   4", "   5",
 		"   6", "   7", "   8", "   9", "  10",
 	)
+
+	var row int
 ROW_LOOP:
 	for {
 		var found bool
-		for col = 0; col < int32(tableauWidth); col++ {
-			if row < g.Stack[col].HiddenCount {
+		for col := 0; col < game.TableauWidth; col++ {
+			if row < t[col].HiddenCount {
 				image[col] = stringBack
 				found = true
 			} else {
-				visibleRow := row - g.Stack[col].HiddenCount
-				if visibleRow < int32(len(g.Stack[col].Cards)) {
-					image[col] = cardStrings[*g.Stack[col].Cards[visibleRow]]
+				visibleRow := row - t[col].HiddenCount
+				if visibleRow < len(t[col].Cards) {
+					image[col] = cardStrings[t[col].Cards[visibleRow]]
 					found = true
 				} else {
 					image[col] = ""

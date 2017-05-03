@@ -1,11 +1,13 @@
 package main
 
-import pb "github.com/dougfort/arachne/arachne"
+import (
+	"fmt"
 
-func displayMoves(g *pb.Game) {
-	/*
-		for i, move := range g.remote.Tableau.EnumerateMoves() {
-			fmt.Printf("%2d: %s\n", i+1, move)
-		}
-	*/
+	"github.com/dougfort/arachne/game"
+)
+
+func displayMoves(tableau game.Tableau) {
+	for i, move := range tableau.EnumerateMoves() {
+		fmt.Printf("%2d: %s\n", i+1, move)
+	}
 }

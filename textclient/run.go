@@ -8,7 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	pb "github.com/dougfort/arachne/arachne"
+	"github.com/dougfort/arachne/client"
+	"github.com/dougfort/arachne/game"
 )
 
 var (
@@ -25,16 +26,22 @@ func init() {
 func run() int {
 	var err error
 	var exitCode int
-	var game *pb.Game
+	var c client.Client
+	var tableau game.Tableau
 
-	log.Printf("info: start")
-	fmt.Println("arachne starts")
-	fmt.Println("")
-	if game, err = newGame(); err != nil {
-		fmt.Printf("newGame failed: %s\n", err)
+	c, err = client.New()
+	if err != nil {
+		fmt.Printf("unable to create client: %v\n", err)
 		return -1
 	}
-	displayGameData(game)
+
+	fmt.Println("arachne starts")
+	fmt.Println("")
+	if tableau, err = c.NewGame(); err != nil {
+		fmt.Printf("NewGame failed: %v\n", err)
+		return -1
+	}
+	displayGameData(tableau)
 	fmt.Println("")
 	fmt.Print(">")
 
@@ -51,13 +58,13 @@ RUN_LOOP:
 		switch splitLine[0] {
 		case "new":
 			fmt.Println("starting new game")
-			if game, err = newGame(); err != nil {
-				fmt.Printf("newGame failed: %s\n", err)
+			if tableau, err = c.NewGame(); err != nil {
+				fmt.Printf("NewGame failed: %v\n", err)
 				break RUN_LOOP
 			}
-			displayGameData(game)
+			displayGameData(tableau)
 		case "display":
-			displayTableauStrings(game)
+			displayTableauStrings(tableau)
 			/*
 				case "scan":
 					displayMoves(game)
@@ -102,12 +109,12 @@ RUN_LOOP:
 	return exitCode
 }
 
-func displayGameData(game *pb.Game) {
+func displayGameData(tableau game.Tableau) {
 	fmt.Printf("cards remaining: %d\n", 666)
 	fmt.Println("")
-	displayTableauStrings(game)
+	displayTableauStrings(tableau)
 	fmt.Println("")
-	displayMoves(game)
+	displayMoves(tableau)
 }
 
 /*
