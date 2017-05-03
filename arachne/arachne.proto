@@ -27,8 +27,9 @@ message GameRequest {
 message Game {
     int64 id = 1;
     int64 seed = 2;
+    int32 cardsRemaining = 3;
 
-    repeated Stack stack = 3;
+    repeated Stack stack = 4;
 }
 
 message Stack {

@@ -38,19 +38,19 @@ func displayTableauStrings(t game.Tableau) {
 		gocards.Card{Suit: standard.Diamonds, Rank: standard.Jack}:  "(D,  J)",
 		gocards.Card{Suit: standard.Diamonds, Rank: standard.Queen}: "(D,  Q)",
 		gocards.Card{Suit: standard.Diamonds, Rank: standard.King}:  "(D,  K)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Ace}:     "(H,  A)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Two}:     "(H,  2)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Three}:   "(H,  3)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Four}:    "(H,  4)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Five}:    "(H,  5)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Six}:     "(H,  6)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Seven}:   "(H,  7)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Eight}:   "(H,  8)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Nine}:    "(H,  9)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Ten}:     "(H, 10)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Jack}:    "(H,  J)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.Queen}:   "(H,  Q)",
-		gocards.Card{Suit: standard.Spades, Rank: standard.King}:    "(H,  K)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Ace}:     "(H,  A)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Two}:     "(H,  2)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Three}:   "(H,  3)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Four}:    "(H,  4)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Five}:    "(H,  5)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Six}:     "(H,  6)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Seven}:   "(H,  7)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Eight}:   "(H,  8)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Nine}:    "(H,  9)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Ten}:     "(H, 10)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Jack}:    "(H,  J)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.Queen}:   "(H,  Q)",
+		gocards.Card{Suit: standard.Hearts, Rank: standard.King}:    "(H,  K)",
 		gocards.Card{Suit: standard.Spades, Rank: standard.Ace}:     "(S,  A)",
 		gocards.Card{Suit: standard.Spades, Rank: standard.Two}:     "(S,  2)",
 		gocards.Card{Suit: standard.Spades, Rank: standard.Three}:   "(S,  3)",
@@ -73,9 +73,8 @@ func displayTableauStrings(t game.Tableau) {
 		"   6", "   7", "   8", "   9", "  10",
 	)
 
-	var row int
 ROW_LOOP:
-	for {
+	for row := 0; ; row++ {
 		var found bool
 		for col := 0; col < game.TableauWidth; col++ {
 			if row < t[col].HiddenCount {
@@ -100,6 +99,5 @@ ROW_LOOP:
 			image[5], image[6], image[7], image[8], image[9],
 		)
 
-		row++
 	}
 }

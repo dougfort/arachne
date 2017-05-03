@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/dougfort/arachne/client"
-	"github.com/dougfort/arachne/game"
 )
 
 var (
@@ -27,7 +26,7 @@ func run() int {
 	var err error
 	var exitCode int
 	var c client.Client
-	var tableau game.Tableau
+	var lg client.LocalGame
 
 	c, err = client.New()
 	if err != nil {
@@ -37,11 +36,11 @@ func run() int {
 
 	fmt.Println("arachne starts")
 	fmt.Println("")
-	if tableau, err = c.NewGame(); err != nil {
+	if lg, err = c.NewGame(); err != nil {
 		fmt.Printf("NewGame failed: %v\n", err)
 		return -1
 	}
-	displayGameData(tableau)
+	displayGameData(lg)
 	fmt.Println("")
 	fmt.Print(">")
 
@@ -58,13 +57,13 @@ RUN_LOOP:
 		switch splitLine[0] {
 		case "new":
 			fmt.Println("starting new game")
-			if tableau, err = c.NewGame(); err != nil {
+			if lg, err = c.NewGame(); err != nil {
 				fmt.Printf("NewGame failed: %v\n", err)
 				break RUN_LOOP
 			}
-			displayGameData(tableau)
+			displayGameData(lg)
 		case "display":
-			displayTableauStrings(tableau)
+			displayTableauStrings(lg.Tableau)
 			/*
 				case "scan":
 					displayMoves(game)
@@ -109,12 +108,14 @@ RUN_LOOP:
 	return exitCode
 }
 
-func displayGameData(tableau game.Tableau) {
-	fmt.Printf("cards remaining: %d\n", 666)
+func displayGameData(lg client.LocalGame) {
+	fmt.Printf("seed: %d\n", lg.Seed)
 	fmt.Println("")
-	displayTableauStrings(tableau)
+	fmt.Printf("cards remaining: %d\n", lg.CardsRemaining)
 	fmt.Println("")
-	displayMoves(tableau)
+	displayTableauStrings(lg.Tableau)
+	fmt.Println("")
+	displayMoves(lg.Tableau)
 }
 
 /*

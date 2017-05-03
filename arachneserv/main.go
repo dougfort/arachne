@@ -43,15 +43,23 @@ func (s *arachneServer) StartGame(
 	}
 
 	pbGame.Seed = localGame.Deck.Seed()
-	pbGame.Stack = make([]*pb.Stack, game.TableauWidth)
-	for i := 0; i < game.TableauWidth; i++ {
-		pbGame.Stack[i] = new(pb.Stack)
-		pbGame.Stack[i].HiddenCount = int32(localGame.Tableau[i].HiddenCount)
-		cardsLen := len(localGame.Tableau[i].Cards)
-		pbGame.Stack[i].Cards = make([]*pb.Card, cardsLen)
-		for j := 0; j < cardsLen; j++ {
-			localCard := localGame.Tableau[i].Cards[j]
-			pbGame.Stack[i].Cards[j] =
+	pbGame.Stack = arachne2pb(localGame.Tableau)
+	pbGame.CardsRemaining = int32(localGame.Deck.RemainingCards())
+
+	s.active[pbGame.Id] = localGame
+	return &pbGame, nil
+}
+
+func arachne2pb(tableau game.Tableau) []*pb.Stack {
+	stack := make([]*pb.Stack, game.TableauWidth)
+	for col := 0; col < game.TableauWidth; col++ {
+		stack[col] = new(pb.Stack)
+		stack[col].HiddenCount = int32(tableau[col].HiddenCount)
+		cardsLen := len(tableau[col].Cards)
+		stack[col].Cards = make([]*pb.Card, cardsLen)
+		for row := 0; row < cardsLen; row++ {
+			localCard := tableau[col].Cards[row]
+			stack[col].Cards[row] =
 				&pb.Card{
 					Suit: int32(localCard.Suit),
 					Rank: int32(localCard.Rank),
@@ -59,8 +67,7 @@ func (s *arachneServer) StartGame(
 		}
 	}
 
-	s.active[pbGame.Id] = localGame
-	return &pbGame, nil
+	return stack
 }
 
 func newServer() *arachneServer {

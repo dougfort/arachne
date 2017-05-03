@@ -13,14 +13,20 @@ import (
 	"github.com/dougfort/gocards"
 )
 
+type LocalGame struct {
+	Tableau        game.Tableau
+	CardsRemaining int
+	Seed           int64
+}
+
 // Client manages communication wiht the arachne server
 type Client interface {
 
 	// NewGame requests a new game with a random seed
-	NewGame() (game.Tableau, error)
+	NewGame() (LocalGame, error)
 
 	// ReplayGame requests a new game with a known seed
-	ReplayGame(seed int64) (game.Tableau, error)
+	ReplayGame(seed int64) (LocalGame, error)
 
 	// Close closes the server connection and releasess all resources
 	Close() error
@@ -30,7 +36,6 @@ type clientImpl struct {
 	conn     *grpc.ClientConn
 	pbClient pb.ArachneClient
 	gameID   int64
-	seed     int64
 }
 
 const serverAddr = "127.0.0.1:10000"
@@ -52,21 +57,33 @@ func New() (Client, error) {
 }
 
 // NewGame requests a new game with a random seed
-func (c *clientImpl) NewGame() (game.Tableau, error) {
+func (c *clientImpl) NewGame() (LocalGame, error) {
 	var pbGame *pb.Game
+	var lg LocalGame
 	var err error
 
-	pbGame, err = c.pbClient.StartGame(context.Background(), &pb.GameRequest{})
+	pbGame, err = c.pbClient.StartGame(
+		context.Background(),
+		&pb.GameRequest{},
+	)
 	if err != nil {
-		return game.Tableau{}, errors.Wrap(err, "NewGame()")
+		return LocalGame{}, errors.Wrap(err, "NewGame()")
 	}
 
-	return pb2arachne(pbGame)
+	lg.Seed = pbGame.Seed
+	lg.CardsRemaining = int(pbGame.CardsRemaining)
+
+	if lg.Tableau, err = pb2arachne(pbGame); err != nil {
+		return LocalGame{}, errors.Wrap(err, "pb2arachne")
+	}
+
+	return lg, nil
 }
 
 // ReplayGame requests a new game with a known seed
-func (c *clientImpl) ReplayGame(seed int64) (game.Tableau, error) {
+func (c *clientImpl) ReplayGame(seed int64) (LocalGame, error) {
 	var pbGame *pb.Game
+	var lg LocalGame
 	var err error
 
 	pbGame, err = c.pbClient.StartGame(
@@ -77,10 +94,16 @@ func (c *clientImpl) ReplayGame(seed int64) (game.Tableau, error) {
 		},
 	)
 	if err != nil {
-		return game.Tableau{}, errors.Wrap(err, "ReplayGame()")
+		return LocalGame{}, errors.Wrap(err, "ReplayGame()")
 	}
 
-	return pb2arachne(pbGame)
+	lg.CardsRemaining = int(pbGame.CardsRemaining)
+
+	if lg.Tableau, err = pb2arachne(pbGame); err != nil {
+		return LocalGame{}, errors.Wrap(err, "pb2arachne")
+	}
+
+	return lg, nil
 }
 
 // Close closes the server connection and releasess all resources
@@ -92,7 +115,6 @@ func (c *clientImpl) Close() error {
 		c.pbClient = nil
 		c.conn = nil
 		c.gameID = 0
-		c.seed = 0
 		return nil
 	}
 	return errors.Errorf("already Closed")
