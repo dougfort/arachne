@@ -18,6 +18,7 @@ type LocalGame struct {
 	Tableau        game.Tableau
 	CardsRemaining int
 	Seed           int64
+	CaptureCount   int
 }
 
 // Client manages communication wiht the arachne server
@@ -141,6 +142,7 @@ func (c *clientImpl) Move(move game.MoveType) (LocalGame, error) {
 
 	lg.CardsRemaining = int(pbGame.CardsRemaining)
 	lg.Seed = pbGame.Seed
+	lg.CaptureCount = int(pbGame.CaptureCount)
 
 	if lg.Tableau, err = pb2arachne(pbGame); err != nil {
 		return LocalGame{}, errors.Wrap(err, "pb2arachne")
@@ -165,6 +167,7 @@ func (c *clientImpl) Deal() (LocalGame, error) {
 
 	lg.CardsRemaining = int(pbGame.CardsRemaining)
 	lg.Seed = pbGame.Seed
+	lg.CaptureCount = int(pbGame.CaptureCount)
 
 	if lg.Tableau, err = pb2arachne(pbGame); err != nil {
 		return LocalGame{}, errors.Wrap(err, "pb2arachne")

@@ -86,6 +86,36 @@ func TestGameMove(t *testing.T) {
 				},
 			},
 		},
+		{
+			desc: "simple capture",
+			before: Game{
+				Deck: nil,
+				Tableau: Tableau{
+					StackType{Cards: gocards.Cards{
+						queenOfClubs,
+						jackOfClubs,
+						tenOfClubs,
+						nineOfClubs,
+						eightOfClubs,
+						sevenOfClubs,
+						sixOfClubs,
+						fiveOfClubs,
+						fourOfClubs,
+						threeOfClubs,
+						twoOfClubs,
+						aceOfClubs,
+					}},
+					StackType{Cards: gocards.Cards{kingOfClubs}},
+				},
+			},
+			moves: []MoveType{
+				MoveType{FromCol: 0, FromRow: 0, ToCol: 1},
+			},
+			after: Game{
+				Deck:    nil,
+				Tableau: Tableau{},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -93,7 +123,7 @@ func TestGameMove(t *testing.T) {
 			var err error
 		MOVE_LOOP:
 			for _, move := range tc.moves {
-				if err = tc.before.Move(move); err != nil {
+				if _, err = tc.before.Move(move); err != nil {
 					if tc.expectError {
 						break MOVE_LOOP
 					}

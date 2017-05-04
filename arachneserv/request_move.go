@@ -19,7 +19,9 @@ func (s *arachneServer) RequestMove(
 	var move game.MoveType
 	var localGame *game.Game
 	var pbGame pb.Game
+	var capture bool
 	var ok bool
+	var err error
 
 	move.FromCol = int(request.FromCol)
 	move.FromRow = int(request.FromRow)
@@ -32,13 +34,17 @@ func (s *arachneServer) RequestMove(
 		return nil, errors.Errorf("unknown game id %d", request.GetId())
 	}
 
-	if err := localGame.Move(move); err != nil {
+	if capture, err = localGame.Move(move); err != nil {
 		return nil, errors.Wrapf(err, "Move %s failed", move)
 	}
 
 	pbGame.Seed = localGame.Deck.Seed()
 	pbGame.Stack = arachne2pb(localGame.Tableau)
 	pbGame.CardsRemaining = int32(localGame.Deck.RemainingCards())
+
+	if capture {
+		pbGame.CaptureCount++
+	}
 
 	s.active[pbGame.Id] = localGame
 	return &pbGame, nil

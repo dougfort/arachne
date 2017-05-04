@@ -106,48 +106,55 @@ ROW_LOOP:
 // Move takes a slice of cards from one Stack and appends it to another
 // If neccessary a hidden card will be exposed in the Stack from which the
 // move originates
-func (g *Game) Move(m MoveType) error {
+// returns 'true' if a run of cards is captured
+func (g *Game) Move(m MoveType) (bool, error) {
 	var s gocards.Cards
+	var suitMatchCount int
+	var capture bool
+	var ok bool
 	var err error
 
 	if s, err = g.Tableau.getSliceToMove(m); err != nil {
-		return errors.Wrap(err, "getSliceToMove failed")
+		return false, errors.Wrap(err, "getSliceToMove failed")
 	}
 
 	if !toColValid(m) {
-		return errors.Errorf("invalid ToCol: %d", m.FromCol)
+		return false, errors.Errorf("invalid ToCol: %d", m.FromCol)
 	}
 
-	if _, ok := g.Tableau.evaluateMoveDest(m, s); !ok {
-		return errors.Errorf("move slice does not fit ToCol")
+	if suitMatchCount, ok = g.Tableau.evaluateMoveDest(m, s); !ok {
+		return false, errors.Errorf("move slice does not fit ToCol")
 	}
 
-	g.Tableau[m.ToCol].Cards = append(g.Tableau[m.ToCol].Cards, s...)
+	// if the move results in a run of all cards from Ace...King
+	// we can capture those cards and remove them from the tableau.
+	if len(s)+suitMatchCount == standard.CardsOfSuit {
+		// remove the cards from the 'To' stack
+		// if the From stack now has no visible cards
+		// bring in the outtermost hidden card
+		captureRow := len(g.Tableau[m.ToCol].Cards) - suitMatchCount
+		if err = g.removeCardsAtRow(m.ToCol, captureRow); err != nil {
+			return false,
+				errors.Wrapf(err, "removeCardsAtRow(%d, %d) %s",
+					m.ToCol, captureRow, m)
+		}
+		capture = true
+	} else {
+		g.Tableau[m.ToCol].Cards =
+			append(g.Tableau[m.ToCol].Cards, s...)
+	}
 
 	// remove the cards from the 'From' stack
 	// if the From stack now has no visible cards
 	// bring in the outtermost hidden card
 	row := g.Tableau.computeCardsRow(m)
-	if !(row >= 0 && row < len(g.Tableau[m.FromCol].Cards)) {
-		return errors.Errorf("computeCardsRow %d invalid: %s", row, m)
-	}
-	g.Tableau[m.FromCol].Cards = g.Tableau[m.FromCol].Cards[:row]
-	if len(g.Tableau[m.FromCol].Cards) == 0 {
-		if g.Tableau[m.FromCol].HiddenCount > 0 {
-			if g.Tableau[m.FromCol].HiddenCount != len(g.HiddenCards[m.FromCol]) {
-				return errors.Errorf("hidden card mismatch %d != %d",
-					g.Tableau[m.FromCol].HiddenCount,
-					len(g.HiddenCards[m.FromCol]),
-				)
-			}
-			r := g.Tableau[m.FromCol].HiddenCount - 1
-			g.Tableau[m.FromCol].Cards = g.HiddenCards[m.FromCol][r:]
-			g.HiddenCards[m.FromCol] = g.HiddenCards[m.FromCol][:r]
-			g.Tableau[m.FromCol].HiddenCount--
-		}
+	if err = g.removeCardsAtRow(m.FromCol, row); err != nil {
+		return false,
+			errors.Wrapf(err, "removeCardsAtRow(%d, %d) %s",
+				m.FromCol, row, m)
 	}
 
-	return nil
+	return capture, nil
 }
 
 // Deal appends a card to each stack
@@ -158,6 +165,29 @@ func (g *Game) Deal() error {
 			return errors.Errorf("deck exhausted")
 		}
 		g.Tableau[col].Cards = append(g.Tableau[col].Cards, card)
+	}
+
+	return nil
+}
+
+func (g *Game) removeCardsAtRow(col, row int) error {
+	if !(row >= 0 && row < len(g.Tableau[col].Cards)) {
+		return errors.Errorf("row %d invalid: col=%d", row, col)
+	}
+	g.Tableau[col].Cards = g.Tableau[col].Cards[:row]
+	if len(g.Tableau[col].Cards) == 0 {
+		if g.Tableau[col].HiddenCount > 0 {
+			if g.Tableau[col].HiddenCount != len(g.HiddenCards[col]) {
+				return errors.Errorf("hidden card mismatch %d != %d",
+					g.Tableau[col].HiddenCount,
+					len(g.HiddenCards[col]),
+				)
+			}
+			r := g.Tableau[col].HiddenCount - 1
+			g.Tableau[col].Cards = g.HiddenCards[col][r:]
+			g.HiddenCards[col] = g.HiddenCards[col][:r]
+			g.Tableau[col].HiddenCount--
+		}
 	}
 
 	return nil

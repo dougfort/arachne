@@ -117,6 +117,8 @@ RUN_LOOP:
 func displayGameData(lg client.LocalGame) {
 	fmt.Printf("seed: %d\n", lg.Seed)
 	fmt.Println("")
+	fmt.Printf("captures: %d\n", lg.CaptureCount)
+	fmt.Println("")
 	fmt.Printf("cards remaining: %d\n", lg.CardsRemaining)
 	fmt.Println("")
 	displayTableauStrings(lg.Tableau)
