@@ -1,4 +1,4 @@
-package main
+package kit
 
 import "os"
 
@@ -7,7 +7,8 @@ const (
 	defaultAddress = ":10000"
 )
 
-func getAddressFromEnv() string {
+// GetAddressFromEnv gets the arachne server address
+func GetAddressFromEnv() string {
 	var address string
 
 	if address = os.Getenv(envAddress); address == "" {

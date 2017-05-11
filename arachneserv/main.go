@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 
 	"github.com/dougfort/arachne/game"
+	"github.com/dougfort/arachne/kit"
 
 	pb "github.com/dougfort/arachne/arachne"
 )
@@ -27,7 +28,7 @@ func newServer() *arachneServer {
 }
 
 func main() {
-	address := getAddressFromEnv()
+	address := kit.GetAddressFromEnv()
 
 	grpclog.Printf("listening to: %s", address)
 	lis, err := net.Listen("tcp", address)

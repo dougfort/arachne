@@ -7,10 +7,11 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "github.com/dougfort/arachne/arachne"
-
-	"github.com/dougfort/arachne/game"
 	"github.com/dougfort/gocards"
+
+	pb "github.com/dougfort/arachne/arachne"
+	"github.com/dougfort/arachne/game"
+	"github.com/dougfort/arachne/kit"
 )
 
 // LocalGame is the client's representation of the state of the game
@@ -49,18 +50,18 @@ type clientImpl struct {
 	gameID   int64
 }
 
-const serverAddr = "127.0.0.1:10000"
-
 // New returns an entity that implements the Client interface
 func New() (Client, error) {
 	var opts []grpc.DialOption
 	var c clientImpl
 	var err error
 
+	address := kit.GetAddressFromEnv()
+
 	opts = append(opts, grpc.WithInsecure())
-	c.conn, err = grpc.Dial(serverAddr, opts...)
+	c.conn, err = grpc.Dial(address, opts...)
 	if err != nil {
-		return nil, errors.WithMessage(err, "fail to dial")
+		return nil, errors.Wrapf(err, "fail to dial: %s", address)
 	}
 	c.pbClient = pb.NewArachneClient(c.conn)
 
