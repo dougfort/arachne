@@ -2,7 +2,6 @@ package main
 
 import (
 	//	"context"
-	"fmt"
 	"net"
 	"sync"
 
@@ -13,8 +12,6 @@ import (
 
 	pb "github.com/dougfort/arachne/arachne"
 )
-
-const port = 10000
 
 type arachneServer struct {
 	mutex  sync.Mutex
@@ -30,10 +27,14 @@ func newServer() *arachneServer {
 }
 
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	address := getAddressFromEnv()
+
+	grpclog.Printf("listening to: %s", address)
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)
 	}
+
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterArachneServer(grpcServer, newServer())
