@@ -10,8 +10,8 @@ import (
 	"github.com/dougfort/gocards"
 
 	pb "github.com/dougfort/arachne/arachne"
-	"github.com/dougfort/arachne/game"
-	"github.com/dougfort/arachne/kit"
+	"github.com/dougfort/arachne/internal/game"
+	"github.com/dougfort/arachne/internal/kit"
 )
 
 // LocalGame is the client's representation of the state of the game

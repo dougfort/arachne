@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/dougfort/arachne/game"
+	"github.com/dougfort/arachne/internal/game"
 
 	"github.com/dougfort/gocards"
 	"github.com/dougfort/gocards/standard"

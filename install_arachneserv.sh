@@ -4,6 +4,6 @@
 set -e
 set -x
 
-pushd $GOPATH/src/github.com/dougfort/arachne/arachneserv
+pushd $GOPATH/src/github.com/dougfort/arachne/cmd/arachneserv
 go install -race
 popd

@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
-	"github.com/dougfort/arachne/game"
-	"github.com/dougfort/arachne/kit"
+	"github.com/dougfort/arachne/internal/game"
+	"github.com/dougfort/arachne/internal/kit"
 
 	pb "github.com/dougfort/arachne/arachne"
 )
