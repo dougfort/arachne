@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/dougfort/arachne/game"
+	"github.com/dougfort/arachne/internal/game"
 
 	pb "github.com/dougfort/arachne/arachne"
 )

@@ -11,9 +11,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/dougfort/arachne/client"
+	"github.com/dougfort/arachne/internal/client"
 
-	gamelib "github.com/dougfort/arachne/game"
+	gamelib "github.com/dougfort/arachne/internal/game"
 )
 
 var (
