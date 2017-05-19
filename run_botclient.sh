@@ -4,4 +4,5 @@
 set -e
 set -x
 
-$GOPATH/bin/botclient |& tee /tmp/botclient.log
+$GOPATH/bin/botclient -max-turns=10 \
+	|& tee /tmp/botclient.log
