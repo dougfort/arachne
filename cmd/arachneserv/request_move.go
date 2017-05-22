@@ -1,8 +1,7 @@
 package main
 
 import (
-	//	"context"
-	context "golang.org/x/net/context"
+	oldcontext "golang.org/x/net/context"
 
 	"github.com/pkg/errors"
 
@@ -13,7 +12,7 @@ import (
 
 // RequestMove requests a move of cards
 func (s *arachneServer) RequestMove(
-	ctx context.Context,
+	ctx oldcontext.Context,
 	request *pb.MoveRequest,
 ) (*pb.Game, error) {
 	var move game.MoveType

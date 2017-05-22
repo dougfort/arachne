@@ -1,8 +1,7 @@
 package main
 
 import (
-	//	"context"
-	context "golang.org/x/net/context"
+	oldcontext "golang.org/x/net/context"
 
 	"github.com/pkg/errors"
 
@@ -13,7 +12,7 @@ import (
 
 // RequestDeal requests a deal
 func (s *arachneServer) RequestDeal(
-	ctx context.Context,
+	ctx oldcontext.Context,
 	request *pb.DealRequest,
 ) (*pb.Game, error) {
 	var localGame *game.Game

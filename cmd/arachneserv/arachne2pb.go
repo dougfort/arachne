@@ -1,8 +1,6 @@
 package main
 
 import (
-	//	"context"
-
 	"github.com/dougfort/arachne/internal/game"
 
 	pb "github.com/dougfort/arachne/arachne"
