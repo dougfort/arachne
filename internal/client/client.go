@@ -3,15 +3,14 @@ package client
 import (
 	"context"
 
-	"github.com/pkg/errors"
-
 	"google.golang.org/grpc"
+
+	"github.com/pkg/errors"
 
 	"github.com/dougfort/gocards"
 
 	pb "github.com/dougfort/arachne/arachne"
 	"github.com/dougfort/arachne/internal/game"
-	"github.com/dougfort/arachne/internal/kit"
 )
 
 // LocalGame is the client's representation of the state of the game
@@ -51,12 +50,10 @@ type clientImpl struct {
 }
 
 // New returns an entity that implements the Client interface
-func New() (Client, error) {
+func New(address string) (Client, error) {
 	var opts []grpc.DialOption
 	var c clientImpl
 	var err error
-
-	address := kit.GetAddressFromEnv()
 
 	opts = append(opts, grpc.WithInsecure())
 	c.conn, err = grpc.Dial(address, opts...)

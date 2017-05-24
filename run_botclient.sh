@@ -4,5 +4,7 @@
 set -e
 set -x
 
+export ARACHNE_ADDRESS=":10000"
+
 $GOPATH/bin/botclient -max-turns=10 \
 	|& tee /tmp/botclient.log

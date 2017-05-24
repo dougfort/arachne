@@ -7,8 +7,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
+	"github.com/ardanlabs/kit/cfg"
+
 	"github.com/dougfort/arachne/internal/game"
-	"github.com/dougfort/arachne/internal/kit"
 
 	pb "github.com/dougfort/arachne/arachne"
 )
@@ -27,7 +28,16 @@ func newServer() *arachneServer {
 }
 
 func main() {
-	address := kit.GetAddressFromEnv()
+	const cfgNamespace = "arachne"
+	var address string
+	var err error
+
+	err = cfg.Init(cfg.EnvProvider{Namespace: cfgNamespace})
+	if err != nil {
+		panic(err)
+	}
+
+	address = cfg.MustString("ADDRESS")
 
 	grpclog.Printf("listening to: %s", address)
 	lis, err := net.Listen("tcp", address)

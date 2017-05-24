@@ -11,6 +11,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ardanlabs/kit/cfg"
+
 	"github.com/dougfort/arachne/internal/client"
 
 	gamelib "github.com/dougfort/arachne/internal/game"
@@ -28,12 +30,24 @@ func init() {
 // run is the actual main body of the program
 // it returns an exit code to main
 func run() int {
+	const cfgNamespace = "arachne"
+	const defaultAddress = ":10000"
+	var address string
 	var err error
 	var exitCode int
 	var c client.Client
 	var lg client.LocalGame
 
-	c, err = client.New()
+	err = cfg.Init(cfg.EnvProvider{Namespace: cfgNamespace})
+	if err != nil {
+		panic(err)
+	}
+
+	if address, err = cfg.String("ADDRESS"); err != nil {
+		address = defaultAddress
+	}
+
+	c, err = client.New(address)
 	if err != nil {
 		fmt.Printf("unable to create client: %v\n", err)
 		return -1
