@@ -5,9 +5,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/go-kit/kit/log"
-
 	"github.com/ardanlabs/kit/cfg"
+	"github.com/ardanlabs/kit/log"
 
 	"github.com/dougfort/arachne/internal/client"
 )
@@ -15,13 +14,13 @@ import (
 // run is the actual main body of the program
 // it returns an exit code to main
 func run() int {
+	const fname = "run"
 	const cfgNamespace = "arachne"
-	const defaultAddress = ":10000"
 	var address string
 	var seedStr string
 	var seed int64
+	var logCtx string
 	var maxTurns int
-	var logger log.Logger
 	var c client.Client
 	var lg client.LocalGame
 	var err error
@@ -31,17 +30,22 @@ func run() int {
 		panic(err)
 	}
 
-	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
-
 	parseCommandLine()
 
-	if address, err = cfg.String("ADDRESS"); err != nil {
-		address = defaultAddress
+	logLevel := func() int {
+		ll, err := cfg.Int("LOGGING_LEVEL")
+		if err != nil {
+			return log.DEV
+		}
+		return ll
 	}
+	log.Init(os.Stderr, logLevel, log.Ldefault)
+
+	address = cfg.MustString("ADDRESS")
 
 	c, err = client.New(address)
 	if err != nil {
-		logger.Log("error", fmt.Sprintf("client.New(): %v", err))
+		log.Error(logCtx, fname, err, "client.New(%s)", address)
 		return -1
 	}
 
@@ -49,46 +53,40 @@ func run() int {
 	seedStr, err = cfg.String("SEED")
 	if err == nil {
 		if seed, err = strconv.ParseInt(seedStr, 10, 64); err != nil {
-			logger.Log("error", fmt.Sprintf("strconv.ParseInt: %v", err))
+			log.Error(logCtx, fname, err, "strconv.ParseInt(%s)", seedStr)
 			return -1
 		}
 	}
 
 	if seed == 0 {
 		if lg, err = c.NewGame(); err != nil {
-			logger.Log("error", fmt.Sprintf("c.NewGame(): %v", err))
+			log.Error(logCtx, fname, err, "c.NewGame()")
 			return -1
 		}
-		logger.Log("game-type", "new", "seed", lg.Seed)
+		logCtx = fmt.Sprintf("%d", lg.Seed)
+		log.User(logCtx, fname, "new game")
 	} else {
 		if lg, err = c.ReplayGame(seed); err != nil {
-			logger.Log("error", fmt.Sprintf("c.NewGame(): %v", err))
+			log.Error(logCtx, fname, err, "c.NewGame()")
 			return -1
 		}
-		logger.Log("game-type", "replay", "seed", lg.Seed)
+		logCtx = fmt.Sprintf("%d", lg.Seed)
+		log.User(logCtx, fname, "replay")
 	}
 
 	maxTurns = cfg.MustInt("MAX_TURNS")
 
-	var turn int
-	turnValuer := func() log.Valuer {
-		return func() interface{} {
-			return turn
-		}
-	}()
-	logger = log.With(logger, "turn", turnValuer)
-
 TURN_LOOP:
-	for turn = 1; maxTurns == -1 || turn <= maxTurns; turn++ {
+	for turn := 1; maxTurns == -1 || turn <= maxTurns; turn++ {
 		availableMoves := lg.Tableau.EnumerateMoves()
 		if len(availableMoves) == 0 {
 			if lg.CardsRemaining == 0 {
-				logger.Log("end", "deadlock")
+				log.User(logCtx, fname, "ends in deadlock")
 				break TURN_LOOP
 			}
-			logger.Log("deal", "")
+			log.User(logCtx, fname, "deal")
 			if lg, err = c.Deal(); err != nil {
-				logger.Log("error", fmt.Sprintf("Deal() %v", err))
+				log.Error(logCtx, fname, err, "Deal()")
 				return -1
 			}
 			continue TURN_LOOP
@@ -98,11 +96,11 @@ TURN_LOOP:
 		move := availableMoves[0]
 
 		if lg, err = c.Move(move.MoveType); err != nil {
-			logger.Log("error", fmt.Sprintf("Move(%s): %v", move.MoveType, err))
+			log.Error(logCtx, fname, err, "Move(%s)", move.MoveType)
 			return -1
 		}
 
-		logger.Log("move", move)
+		log.User(logCtx, fname, move.String())
 	}
 
 	return 0
