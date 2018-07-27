@@ -11,8 +11,8 @@ func (s *arachneServer) EndGame(
 	ctx oldcontext.Context,
 	request *pb.EndGameRequest,
 ) (*pb.EndGameResponse, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Lock()
+	defer s.Unlock()
 
 	delete(s.active, request.Id)
 

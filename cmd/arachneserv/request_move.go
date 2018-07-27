@@ -26,8 +26,8 @@ func (s *arachneServer) RequestMove(
 	move.FromRow = int(request.FromRow)
 	move.ToCol = int(request.ToCol)
 
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Lock()
+	defer s.Unlock()
 
 	if localGame, ok = s.active[request.GetId()]; !ok {
 		return nil, errors.Errorf("unknown game id %d", request.GetId())

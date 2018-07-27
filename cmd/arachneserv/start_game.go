@@ -31,8 +31,8 @@ func (s *arachneServer) StartGame(
 	pbGame.Stack = arachne2pb(localGame.Tableau)
 	pbGame.CardsRemaining = int32(localGame.Deck.RemainingCards())
 
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.Lock()
+	defer s.Unlock()
 
 	pbGame.Id = s.nextID
 	s.nextID++

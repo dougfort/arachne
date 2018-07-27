@@ -6,4 +6,4 @@ set -x
 
 export ARACHNE_ADDRESS=":10000"
 
-$GOPATH/bin/arachneserv
+$GOPATH/bin/arachneserv &
