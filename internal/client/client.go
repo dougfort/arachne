@@ -46,6 +46,7 @@ type Client interface {
 type clientImpl struct {
 	conn     *grpc.ClientConn
 	pbClient pb.ArachneClient
+	stream   pb.Arachne_PlayClient
 	gameID   int64
 }
 
@@ -61,6 +62,9 @@ func New(address string) (Client, error) {
 		return nil, errors.Wrapf(err, "fail to dial: %s", address)
 	}
 	c.pbClient = pb.NewArachneClient(c.conn)
+	if c.stream, err = c.pbClient.Play(context.Background()); err != nil {
+		return nil, errors.Wrap(err, "c.pbClient.Play")
+	}
 
 	return &c, nil
 }
@@ -68,15 +72,20 @@ func New(address string) (Client, error) {
 // NewGame requests a new game with a random seed
 func (c *clientImpl) NewGame() (LocalGame, error) {
 	var pbGame *pb.Game
+	var gameReq pb.PlayRequest_GameRequest
+	var playReq pb.PlayRequest
 	var lg LocalGame
 	var err error
 
-	pbGame, err = c.pbClient.StartGame(
-		context.Background(),
-		&pb.GameRequest{},
-	)
-	if err != nil {
-		return LocalGame{}, errors.Wrap(err, "NewGame()")
+	gameReq.GameRequest.Gametype = pb.GameRequest_RANDOM
+	playReq.TestOneof = &gameReq
+
+	if err = c.stream.Send(&playReq); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Send")
+	}
+
+	if pbGame, err = c.stream.Recv(); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Recv()")
 	}
 
 	c.gameID = pbGame.Id
@@ -94,18 +103,21 @@ func (c *clientImpl) NewGame() (LocalGame, error) {
 // ReplayGame requests a new game with a known seed
 func (c *clientImpl) ReplayGame(seed int64) (LocalGame, error) {
 	var pbGame *pb.Game
+	var gameReq pb.PlayRequest_GameRequest
+	var playReq pb.PlayRequest
 	var lg LocalGame
 	var err error
 
-	pbGame, err = c.pbClient.StartGame(
-		context.Background(),
-		&pb.GameRequest{
-			Gametype: pb.GameRequest_REPLAY,
-			Seed:     seed,
-		},
-	)
-	if err != nil {
-		return LocalGame{}, errors.Wrap(err, "ReplayGame()")
+	gameReq.GameRequest.Gametype = pb.GameRequest_REPLAY
+	gameReq.GameRequest.Seed = seed
+	playReq.TestOneof = &gameReq
+
+	if err = c.stream.Send(&playReq); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Send")
+	}
+
+	if pbGame, err = c.stream.Recv(); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Recv()")
 	}
 
 	c.gameID = pbGame.Id

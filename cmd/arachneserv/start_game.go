@@ -1,8 +1,6 @@
 package main
 
 import (
-	oldcontext "golang.org/x/net/context"
-
 	"github.com/pkg/errors"
 
 	"github.com/dougfort/arachne/internal/game"
@@ -12,7 +10,6 @@ import (
 
 // StartGame starts a new game
 func (s *arachneServer) StartGame(
-	ctx oldcontext.Context,
 	request *pb.GameRequest,
 ) (*pb.Game, error) {
 	var localGame *game.Game

@@ -43,7 +43,181 @@ func (x GameRequest_GameType) String() string {
 	return proto.EnumName(GameRequest_GameType_name, int32(x))
 }
 func (GameRequest_GameType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_arachne_e1077b6270f1a69b, []int{0, 0}
+	return fileDescriptor_arachne_e8e706137911f8e4, []int{1, 0}
+}
+
+type PlayRequest struct {
+	// Types that are valid to be assigned to TestOneof:
+	//	*PlayRequest_GameRequest
+	//	*PlayRequest_MoveRequest
+	//	*PlayRequest_DealRequest
+	TestOneof            isPlayRequest_TestOneof `protobuf_oneof:"test_oneof"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
+}
+
+func (m *PlayRequest) Reset()         { *m = PlayRequest{} }
+func (m *PlayRequest) String() string { return proto.CompactTextString(m) }
+func (*PlayRequest) ProtoMessage()    {}
+func (*PlayRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_arachne_e8e706137911f8e4, []int{0}
+}
+func (m *PlayRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlayRequest.Unmarshal(m, b)
+}
+func (m *PlayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlayRequest.Marshal(b, m, deterministic)
+}
+func (dst *PlayRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlayRequest.Merge(dst, src)
+}
+func (m *PlayRequest) XXX_Size() int {
+	return xxx_messageInfo_PlayRequest.Size(m)
+}
+func (m *PlayRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlayRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PlayRequest proto.InternalMessageInfo
+
+type isPlayRequest_TestOneof interface {
+	isPlayRequest_TestOneof()
+}
+
+type PlayRequest_GameRequest struct {
+	GameRequest *GameRequest `protobuf:"bytes,1,opt,name=game_request,json=gameRequest,oneof"`
+}
+type PlayRequest_MoveRequest struct {
+	MoveRequest *MoveRequest `protobuf:"bytes,2,opt,name=move_request,json=moveRequest,oneof"`
+}
+type PlayRequest_DealRequest struct {
+	DealRequest *DealRequest `protobuf:"bytes,3,opt,name=deal_request,json=dealRequest,oneof"`
+}
+
+func (*PlayRequest_GameRequest) isPlayRequest_TestOneof() {}
+func (*PlayRequest_MoveRequest) isPlayRequest_TestOneof() {}
+func (*PlayRequest_DealRequest) isPlayRequest_TestOneof() {}
+
+func (m *PlayRequest) GetTestOneof() isPlayRequest_TestOneof {
+	if m != nil {
+		return m.TestOneof
+	}
+	return nil
+}
+
+func (m *PlayRequest) GetGameRequest() *GameRequest {
+	if x, ok := m.GetTestOneof().(*PlayRequest_GameRequest); ok {
+		return x.GameRequest
+	}
+	return nil
+}
+
+func (m *PlayRequest) GetMoveRequest() *MoveRequest {
+	if x, ok := m.GetTestOneof().(*PlayRequest_MoveRequest); ok {
+		return x.MoveRequest
+	}
+	return nil
+}
+
+func (m *PlayRequest) GetDealRequest() *DealRequest {
+	if x, ok := m.GetTestOneof().(*PlayRequest_DealRequest); ok {
+		return x.DealRequest
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*PlayRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _PlayRequest_OneofMarshaler, _PlayRequest_OneofUnmarshaler, _PlayRequest_OneofSizer, []interface{}{
+		(*PlayRequest_GameRequest)(nil),
+		(*PlayRequest_MoveRequest)(nil),
+		(*PlayRequest_DealRequest)(nil),
+	}
+}
+
+func _PlayRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*PlayRequest)
+	// test_oneof
+	switch x := m.TestOneof.(type) {
+	case *PlayRequest_GameRequest:
+		b.EncodeVarint(1<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.GameRequest); err != nil {
+			return err
+		}
+	case *PlayRequest_MoveRequest:
+		b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.MoveRequest); err != nil {
+			return err
+		}
+	case *PlayRequest_DealRequest:
+		b.EncodeVarint(3<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.DealRequest); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("PlayRequest.TestOneof has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _PlayRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*PlayRequest)
+	switch tag {
+	case 1: // test_oneof.game_request
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(GameRequest)
+		err := b.DecodeMessage(msg)
+		m.TestOneof = &PlayRequest_GameRequest{msg}
+		return true, err
+	case 2: // test_oneof.move_request
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(MoveRequest)
+		err := b.DecodeMessage(msg)
+		m.TestOneof = &PlayRequest_MoveRequest{msg}
+		return true, err
+	case 3: // test_oneof.deal_request
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(DealRequest)
+		err := b.DecodeMessage(msg)
+		m.TestOneof = &PlayRequest_DealRequest{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _PlayRequest_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*PlayRequest)
+	// test_oneof
+	switch x := m.TestOneof.(type) {
+	case *PlayRequest_GameRequest:
+		s := proto.Size(x.GameRequest)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *PlayRequest_MoveRequest:
+		s := proto.Size(x.MoveRequest)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *PlayRequest_DealRequest:
+		s := proto.Size(x.DealRequest)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
 }
 
 type GameRequest struct {
@@ -59,7 +233,7 @@ func (m *GameRequest) Reset()         { *m = GameRequest{} }
 func (m *GameRequest) String() string { return proto.CompactTextString(m) }
 func (*GameRequest) ProtoMessage()    {}
 func (*GameRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_arachne_e1077b6270f1a69b, []int{0}
+	return fileDescriptor_arachne_e8e706137911f8e4, []int{1}
 }
 func (m *GameRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GameRequest.Unmarshal(m, b)
@@ -108,7 +282,7 @@ func (m *Game) Reset()         { *m = Game{} }
 func (m *Game) String() string { return proto.CompactTextString(m) }
 func (*Game) ProtoMessage()    {}
 func (*Game) Descriptor() ([]byte, []int) {
-	return fileDescriptor_arachne_e1077b6270f1a69b, []int{1}
+	return fileDescriptor_arachne_e8e706137911f8e4, []int{2}
 }
 func (m *Game) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Game.Unmarshal(m, b)
@@ -175,7 +349,7 @@ func (m *Stack) Reset()         { *m = Stack{} }
 func (m *Stack) String() string { return proto.CompactTextString(m) }
 func (*Stack) ProtoMessage()    {}
 func (*Stack) Descriptor() ([]byte, []int) {
-	return fileDescriptor_arachne_e1077b6270f1a69b, []int{2}
+	return fileDescriptor_arachne_e8e706137911f8e4, []int{3}
 }
 func (m *Stack) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Stack.Unmarshal(m, b)
@@ -221,7 +395,7 @@ func (m *Card) Reset()         { *m = Card{} }
 func (m *Card) String() string { return proto.CompactTextString(m) }
 func (*Card) ProtoMessage()    {}
 func (*Card) Descriptor() ([]byte, []int) {
-	return fileDescriptor_arachne_e1077b6270f1a69b, []int{3}
+	return fileDescriptor_arachne_e8e706137911f8e4, []int{4}
 }
 func (m *Card) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Card.Unmarshal(m, b)
@@ -269,7 +443,7 @@ func (m *MoveRequest) Reset()         { *m = MoveRequest{} }
 func (m *MoveRequest) String() string { return proto.CompactTextString(m) }
 func (*MoveRequest) ProtoMessage()    {}
 func (*MoveRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_arachne_e1077b6270f1a69b, []int{4}
+	return fileDescriptor_arachne_e8e706137911f8e4, []int{5}
 }
 func (m *MoveRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MoveRequest.Unmarshal(m, b)
@@ -328,7 +502,7 @@ func (m *DealRequest) Reset()         { *m = DealRequest{} }
 func (m *DealRequest) String() string { return proto.CompactTextString(m) }
 func (*DealRequest) ProtoMessage()    {}
 func (*DealRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_arachne_e1077b6270f1a69b, []int{5}
+	return fileDescriptor_arachne_e8e706137911f8e4, []int{6}
 }
 func (m *DealRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DealRequest.Unmarshal(m, b)
@@ -355,83 +529,14 @@ func (m *DealRequest) GetId() int64 {
 	return 0
 }
 
-type EndGameRequest struct {
-	Id                   int64    `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *EndGameRequest) Reset()         { *m = EndGameRequest{} }
-func (m *EndGameRequest) String() string { return proto.CompactTextString(m) }
-func (*EndGameRequest) ProtoMessage()    {}
-func (*EndGameRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_arachne_e1077b6270f1a69b, []int{6}
-}
-func (m *EndGameRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_EndGameRequest.Unmarshal(m, b)
-}
-func (m *EndGameRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_EndGameRequest.Marshal(b, m, deterministic)
-}
-func (dst *EndGameRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EndGameRequest.Merge(dst, src)
-}
-func (m *EndGameRequest) XXX_Size() int {
-	return xxx_messageInfo_EndGameRequest.Size(m)
-}
-func (m *EndGameRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_EndGameRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_EndGameRequest proto.InternalMessageInfo
-
-func (m *EndGameRequest) GetId() int64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
-type EndGameResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *EndGameResponse) Reset()         { *m = EndGameResponse{} }
-func (m *EndGameResponse) String() string { return proto.CompactTextString(m) }
-func (*EndGameResponse) ProtoMessage()    {}
-func (*EndGameResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_arachne_e1077b6270f1a69b, []int{7}
-}
-func (m *EndGameResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_EndGameResponse.Unmarshal(m, b)
-}
-func (m *EndGameResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_EndGameResponse.Marshal(b, m, deterministic)
-}
-func (dst *EndGameResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EndGameResponse.Merge(dst, src)
-}
-func (m *EndGameResponse) XXX_Size() int {
-	return xxx_messageInfo_EndGameResponse.Size(m)
-}
-func (m *EndGameResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_EndGameResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_EndGameResponse proto.InternalMessageInfo
-
 func init() {
+	proto.RegisterType((*PlayRequest)(nil), "arachne.PlayRequest")
 	proto.RegisterType((*GameRequest)(nil), "arachne.GameRequest")
 	proto.RegisterType((*Game)(nil), "arachne.Game")
 	proto.RegisterType((*Stack)(nil), "arachne.Stack")
 	proto.RegisterType((*Card)(nil), "arachne.Card")
 	proto.RegisterType((*MoveRequest)(nil), "arachne.MoveRequest")
 	proto.RegisterType((*DealRequest)(nil), "arachne.DealRequest")
-	proto.RegisterType((*EndGameRequest)(nil), "arachne.EndGameRequest")
-	proto.RegisterType((*EndGameResponse)(nil), "arachne.EndGameResponse")
 	proto.RegisterEnum("arachne.GameRequest_GameType", GameRequest_GameType_name, GameRequest_GameType_value)
 }
 
@@ -447,14 +552,9 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ArachneClient interface {
-	// StartGame starts a new game
-	StartGame(ctx context.Context, in *GameRequest, opts ...grpc.CallOption) (*Game, error)
-	// RequestMove requests a move of cards
-	RequestMove(ctx context.Context, in *MoveRequest, opts ...grpc.CallOption) (*Game, error)
-	// RequestDeal requests a deal
-	RequestDeal(ctx context.Context, in *DealRequest, opts ...grpc.CallOption) (*Game, error)
-	// EndGame requests the end of a game
-	EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*EndGameResponse, error)
+	// Play executes a stream of game commands,
+	// streaming back the current state of the game
+	Play(ctx context.Context, opts ...grpc.CallOption) (Arachne_PlayClient, error)
 }
 
 type arachneClient struct {
@@ -465,187 +565,119 @@ func NewArachneClient(cc *grpc.ClientConn) ArachneClient {
 	return &arachneClient{cc}
 }
 
-func (c *arachneClient) StartGame(ctx context.Context, in *GameRequest, opts ...grpc.CallOption) (*Game, error) {
-	out := new(Game)
-	err := c.cc.Invoke(ctx, "/arachne.Arachne/StartGame", in, out, opts...)
+func (c *arachneClient) Play(ctx context.Context, opts ...grpc.CallOption) (Arachne_PlayClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Arachne_serviceDesc.Streams[0], "/arachne.Arachne/Play", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &arachnePlayClient{stream}
+	return x, nil
 }
 
-func (c *arachneClient) RequestMove(ctx context.Context, in *MoveRequest, opts ...grpc.CallOption) (*Game, error) {
-	out := new(Game)
-	err := c.cc.Invoke(ctx, "/arachne.Arachne/RequestMove", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+type Arachne_PlayClient interface {
+	Send(*PlayRequest) error
+	Recv() (*Game, error)
+	grpc.ClientStream
 }
 
-func (c *arachneClient) RequestDeal(ctx context.Context, in *DealRequest, opts ...grpc.CallOption) (*Game, error) {
-	out := new(Game)
-	err := c.cc.Invoke(ctx, "/arachne.Arachne/RequestDeal", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+type arachnePlayClient struct {
+	grpc.ClientStream
 }
 
-func (c *arachneClient) EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*EndGameResponse, error) {
-	out := new(EndGameResponse)
-	err := c.cc.Invoke(ctx, "/arachne.Arachne/EndGame", in, out, opts...)
-	if err != nil {
+func (x *arachnePlayClient) Send(m *PlayRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *arachnePlayClient) Recv() (*Game, error) {
+	m := new(Game)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
-	return out, nil
+	return m, nil
 }
 
 // ArachneServer is the server API for Arachne service.
 type ArachneServer interface {
-	// StartGame starts a new game
-	StartGame(context.Context, *GameRequest) (*Game, error)
-	// RequestMove requests a move of cards
-	RequestMove(context.Context, *MoveRequest) (*Game, error)
-	// RequestDeal requests a deal
-	RequestDeal(context.Context, *DealRequest) (*Game, error)
-	// EndGame requests the end of a game
-	EndGame(context.Context, *EndGameRequest) (*EndGameResponse, error)
+	// Play executes a stream of game commands,
+	// streaming back the current state of the game
+	Play(Arachne_PlayServer) error
 }
 
 func RegisterArachneServer(s *grpc.Server, srv ArachneServer) {
 	s.RegisterService(&_Arachne_serviceDesc, srv)
 }
 
-func _Arachne_StartGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GameRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ArachneServer).StartGame(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/arachne.Arachne/StartGame",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArachneServer).StartGame(ctx, req.(*GameRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+func _Arachne_Play_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ArachneServer).Play(&arachnePlayServer{stream})
 }
 
-func _Arachne_RequestMove_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MoveRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ArachneServer).RequestMove(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/arachne.Arachne/RequestMove",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArachneServer).RequestMove(ctx, req.(*MoveRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+type Arachne_PlayServer interface {
+	Send(*Game) error
+	Recv() (*PlayRequest, error)
+	grpc.ServerStream
 }
 
-func _Arachne_RequestDeal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DealRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ArachneServer).RequestDeal(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/arachne.Arachne/RequestDeal",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArachneServer).RequestDeal(ctx, req.(*DealRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+type arachnePlayServer struct {
+	grpc.ServerStream
 }
 
-func _Arachne_EndGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EndGameRequest)
-	if err := dec(in); err != nil {
+func (x *arachnePlayServer) Send(m *Game) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *arachnePlayServer) Recv() (*PlayRequest, error) {
+	m := new(PlayRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
-	if interceptor == nil {
-		return srv.(ArachneServer).EndGame(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/arachne.Arachne/EndGame",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArachneServer).EndGame(ctx, req.(*EndGameRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return m, nil
 }
 
 var _Arachne_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "arachne.Arachne",
 	HandlerType: (*ArachneServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "StartGame",
-			Handler:    _Arachne_StartGame_Handler,
-		},
-		{
-			MethodName: "RequestMove",
-			Handler:    _Arachne_RequestMove_Handler,
-		},
-		{
-			MethodName: "RequestDeal",
-			Handler:    _Arachne_RequestDeal_Handler,
-		},
-		{
-			MethodName: "EndGame",
-			Handler:    _Arachne_EndGame_Handler,
+			StreamName:    "Play",
+			Handler:       _Arachne_Play_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "arachne.proto",
 }
 
-func init() { proto.RegisterFile("arachne.proto", fileDescriptor_arachne_e1077b6270f1a69b) }
+func init() { proto.RegisterFile("arachne.proto", fileDescriptor_arachne_e8e706137911f8e4) }
 
-var fileDescriptor_arachne_e1077b6270f1a69b = []byte{
-	// 467 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x53, 0x5d, 0x6f, 0xd3, 0x30,
-	0x14, 0xad, 0xdb, 0x66, 0x1d, 0x37, 0xb4, 0x1b, 0xd6, 0x24, 0xa2, 0xa1, 0x49, 0x91, 0x41, 0xa8,
-	0x4f, 0x11, 0x2a, 0xbc, 0xf0, 0x82, 0xd4, 0x75, 0xd3, 0x5e, 0xd8, 0xa8, 0x3c, 0x5e, 0x78, 0x34,
-	0xf1, 0x25, 0x8b, 0xd6, 0xc4, 0xc1, 0x71, 0x80, 0xbd, 0xf1, 0x43, 0xf8, 0x83, 0xfc, 0x0b, 0x64,
-	0xe7, 0x43, 0x69, 0x37, 0xf6, 0x76, 0xee, 0xbd, 0xe7, 0xdc, 0xe4, 0x1c, 0xdb, 0x30, 0x15, 0x5a,
-	0xc4, 0x37, 0x39, 0x46, 0x85, 0x56, 0x46, 0xd1, 0x49, 0x53, 0xb2, 0xdf, 0x04, 0xfc, 0x0b, 0x91,
-	0x21, 0xc7, 0xef, 0x15, 0x96, 0x86, 0xbe, 0x87, 0xfd, 0x44, 0x64, 0x68, 0xee, 0x0a, 0x0c, 0x48,
-	0x48, 0xe6, 0xb3, 0xc5, 0x49, 0xd4, 0x4a, 0x7b, 0x3c, 0x87, 0x3f, 0xdf, 0x15, 0xc8, 0x3b, 0x3a,
-	0xa5, 0x30, 0x2e, 0x11, 0x65, 0x30, 0x0c, 0xc9, 0x7c, 0xc4, 0x1d, 0x66, 0x0c, 0xf6, 0x5b, 0x26,
-	0x05, 0xd8, 0xe3, 0xcb, 0xab, 0xb3, 0x4f, 0x97, 0x87, 0x03, 0x87, 0xcf, 0xd7, 0x1f, 0x97, 0x5f,
-	0x0e, 0x09, 0xfb, 0x43, 0x60, 0x6c, 0x49, 0x74, 0x06, 0xc3, 0x54, 0xba, 0xaf, 0x8e, 0xf8, 0x30,
-	0x95, 0x0f, 0x2d, 0xa4, 0xaf, 0x61, 0x16, 0x0b, 0x2d, 0x4b, 0x8e, 0x99, 0x48, 0xf3, 0x34, 0x4f,
-	0x82, 0x51, 0x48, 0xe6, 0x1e, 0xdf, 0xe9, 0x52, 0x06, 0x4f, 0x63, 0x51, 0x98, 0x4a, 0xe3, 0x4a,
-	0x55, 0xb9, 0x09, 0xc6, 0x8e, 0xb5, 0xd5, 0xa3, 0xaf, 0xc0, 0x2b, 0x8d, 0x88, 0x6f, 0x03, 0x2f,
-	0x1c, 0xcd, 0xfd, 0xc5, 0xac, 0x33, 0x7a, 0x6d, 0xbb, 0xbc, 0x1e, 0xb2, 0x2b, 0xf0, 0x5c, 0x4d,
-	0x43, 0xf0, 0x6f, 0x52, 0x29, 0x31, 0xaf, 0x37, 0x12, 0xb7, 0xb1, 0xdf, 0xa2, 0x2f, 0xc1, 0x73,
-	0xbf, 0x11, 0x0c, 0xdd, 0xc2, 0x69, 0xb7, 0x70, 0x25, 0xb4, 0xe4, 0xf5, 0x8c, 0x45, 0x30, 0xb6,
-	0xa5, 0x73, 0x57, 0xa5, 0xed, 0x1e, 0x87, 0x6d, 0x4f, 0x8b, 0xfc, 0xd6, 0x39, 0xf6, 0xb8, 0xc3,
-	0x2c, 0x01, 0xff, 0x52, 0xfd, 0xe8, 0x0e, 0x68, 0x37, 0xa4, 0x00, 0x26, 0xdf, 0xb4, 0xca, 0x56,
-	0x6a, 0xd3, 0xa8, 0xda, 0xb2, 0x9d, 0x70, 0xf5, 0xb3, 0xc9, 0xa8, 0x2d, 0xe9, 0x11, 0x78, 0x46,
-	0x59, 0x45, 0x9d, 0x4a, 0x5d, 0xb0, 0x13, 0xf0, 0xcf, 0x50, 0x6c, 0xfe, 0xf3, 0x21, 0x16, 0xc2,
-	0xec, 0x3c, 0x97, 0xfd, 0xbb, 0xb2, 0xcb, 0x78, 0x06, 0x07, 0x1d, 0xa3, 0x2c, 0x54, 0x5e, 0xe2,
-	0xe2, 0x2f, 0x81, 0xc9, 0xb2, 0x0e, 0x81, 0x2e, 0xe0, 0xc9, 0xb5, 0x11, 0xda, 0xb8, 0xb3, 0x3e,
-	0x7a, 0xe8, 0x56, 0x1d, 0x4f, 0xb7, 0xba, 0x6c, 0x40, 0xdf, 0x81, 0xdf, 0xcc, 0x6c, 0x06, 0x3d,
-	0x55, 0x2f, 0x92, 0xc7, 0x54, 0xd6, 0x50, 0x4f, 0xd5, 0xf3, 0x77, 0x5f, 0xf5, 0x01, 0x26, 0xcd,
-	0xef, 0xd3, 0xe7, 0xdd, 0x6c, 0xdb, 0xf2, 0x71, 0x70, 0x7f, 0x50, 0x3b, 0x65, 0x83, 0xd3, 0x37,
-	0xf0, 0x22, 0x55, 0x51, 0xa2, 0x8b, 0x38, 0xc2, 0x5f, 0x22, 0x2b, 0x36, 0x58, 0x46, 0x5a, 0x55,
-	0x06, 0x93, 0x2a, 0x95, 0x78, 0x7a, 0xc0, 0x2d, 0xbe, 0xb0, 0x78, 0x6d, 0xdf, 0xe0, 0x9a, 0x7c,
-	0xdd, 0x73, 0x8f, 0xf1, 0xed, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x97, 0x15, 0xb0, 0x9f, 0x9d,
-	0x03, 0x00, 0x00,
+var fileDescriptor_arachne_e8e706137911f8e4 = []byte{
+	// 439 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x53, 0xc1, 0x6e, 0x13, 0x31,
+	0x10, 0x8d, 0x93, 0xdd, 0xa6, 0x1a, 0x27, 0x51, 0x65, 0xf5, 0xb0, 0x42, 0xaa, 0x14, 0x19, 0x84,
+	0x72, 0x8a, 0x20, 0x9c, 0x90, 0xb8, 0x84, 0x14, 0x95, 0x03, 0x2d, 0x95, 0xe1, 0xc2, 0xa9, 0x32,
+	0xf1, 0x34, 0x5d, 0x35, 0xbb, 0x0e, 0x5e, 0xa7, 0x28, 0x37, 0x3e, 0x84, 0x4f, 0xe2, 0xa3, 0x90,
+	0x67, 0xb3, 0xd9, 0x4d, 0x9a, 0xdb, 0xbc, 0xf1, 0xbc, 0xe7, 0x79, 0xa3, 0x19, 0xe8, 0x6b, 0xa7,
+	0xe7, 0x0f, 0x39, 0x8e, 0x57, 0xce, 0x7a, 0x2b, 0xba, 0x5b, 0x28, 0xff, 0x31, 0xe0, 0xb7, 0x4b,
+	0xbd, 0x51, 0xf8, 0x6b, 0x8d, 0x85, 0x17, 0xef, 0xa1, 0xb7, 0xd0, 0x19, 0xde, 0xb9, 0x12, 0x27,
+	0x6c, 0xc8, 0x46, 0x7c, 0x72, 0x3e, 0xae, 0xe8, 0x57, 0x3a, 0xc3, 0x6d, 0xed, 0xe7, 0x96, 0xe2,
+	0x8b, 0x1a, 0x06, 0x6a, 0x66, 0x9f, 0x6a, 0x6a, 0xfb, 0x80, 0x7a, 0x6d, 0x9f, 0x9a, 0xd4, 0xac,
+	0x86, 0x81, 0x6a, 0x50, 0x2f, 0x77, 0xd4, 0xce, 0x01, 0xf5, 0x12, 0xf5, 0xb2, 0x41, 0x35, 0x35,
+	0xfc, 0xd8, 0x03, 0xf0, 0x58, 0xf8, 0x3b, 0x9b, 0xa3, 0xbd, 0x97, 0x7f, 0x18, 0xf0, 0xab, 0xbd,
+	0x9e, 0x4e, 0x43, 0x8b, 0x7e, 0xb3, 0x42, 0xb2, 0x32, 0x98, 0x5c, 0x1c, 0xb3, 0x42, 0xf1, 0xf7,
+	0xcd, 0x0a, 0xd5, 0xae, 0x5c, 0x08, 0x88, 0x0a, 0x44, 0x43, 0x36, 0x3a, 0x8a, 0x62, 0x29, 0xe1,
+	0xb4, 0xaa, 0x14, 0x00, 0x27, 0x6a, 0x7a, 0x73, 0xf9, 0xf5, 0xfa, 0xac, 0x45, 0xf1, 0xa7, 0xdb,
+	0x2f, 0xd3, 0x1f, 0x67, 0x4c, 0xfe, 0x65, 0x10, 0x85, 0x22, 0x31, 0x80, 0x76, 0x6a, 0xe8, 0xd7,
+	0x8e, 0x6a, 0xa7, 0xe6, 0x98, 0xa0, 0x78, 0x0d, 0x83, 0xb9, 0x76, 0xa6, 0x50, 0x98, 0xe9, 0x34,
+	0x4f, 0xf3, 0x05, 0x59, 0x8f, 0xd5, 0x41, 0x56, 0x48, 0xe8, 0xcd, 0xf5, 0xca, 0xaf, 0x1d, 0xce,
+	0xec, 0x3a, 0xf7, 0x49, 0x44, 0x55, 0x7b, 0x39, 0xf1, 0x0a, 0xe2, 0xc2, 0xeb, 0xf9, 0x63, 0x12,
+	0x0f, 0x3b, 0x23, 0x3e, 0x19, 0xec, 0x8c, 0x7e, 0x0b, 0x59, 0x55, 0x3e, 0xca, 0x1b, 0x88, 0x09,
+	0x8b, 0x21, 0xf0, 0x87, 0xd4, 0x18, 0xcc, 0x4b, 0x45, 0x46, 0x8a, 0xcd, 0x94, 0x78, 0x09, 0x31,
+	0xb5, 0x91, 0xb4, 0x49, 0xb0, 0xbf, 0x13, 0x9c, 0x69, 0x67, 0x54, 0xf9, 0x26, 0xc7, 0x10, 0x05,
+	0x48, 0xee, 0xd6, 0x69, 0xa5, 0x43, 0x71, 0xc8, 0x39, 0x9d, 0x3f, 0x92, 0xe3, 0x58, 0x51, 0x2c,
+	0x17, 0xc0, 0x1b, 0x8b, 0xf0, 0x6c, 0x48, 0x09, 0x74, 0xef, 0x9d, 0xcd, 0x66, 0x76, 0xb9, 0x65,
+	0x55, 0xb0, 0x7a, 0x51, 0xf6, 0xf7, 0x76, 0x46, 0x15, 0x14, 0xe7, 0x10, 0x7b, 0x1b, 0x18, 0xe5,
+	0x54, 0x4a, 0x20, 0x2f, 0x80, 0x37, 0xd6, 0xe6, 0xf0, 0xa3, 0xc9, 0x07, 0xe8, 0x4e, 0x4b, 0x3b,
+	0xe2, 0x2d, 0x44, 0xe1, 0x04, 0x44, 0xbd, 0x6f, 0x8d, 0x8b, 0x78, 0xd1, 0xdf, 0x5b, 0x18, 0xd9,
+	0x1a, 0xb1, 0x37, 0xec, 0xe7, 0x09, 0x9d, 0xd1, 0xbb, 0xff, 0x01, 0x00, 0x00, 0xff, 0xff, 0xef,
+	0x78, 0x1a, 0x98, 0x57, 0x03, 0x00, 0x00,
 }
