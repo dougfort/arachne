@@ -36,9 +36,6 @@ type Client interface {
 	// Deal the next round of cards
 	Deal() (LocalGame, error)
 
-	// EndGame stops the current game on the server
-	EndGame() error
-
 	// Close closes the server connection and releasess all resources
 	Close() error
 }
@@ -46,6 +43,7 @@ type Client interface {
 type clientImpl struct {
 	conn     *grpc.ClientConn
 	pbClient pb.ArachneClient
+	stream   pb.Arachne_PlayClient
 	gameID   int64
 }
 
@@ -61,6 +59,9 @@ func New(address string) (Client, error) {
 		return nil, errors.Wrapf(err, "fail to dial: %s", address)
 	}
 	c.pbClient = pb.NewArachneClient(c.conn)
+	if c.stream, err = c.pbClient.Play(context.Background()); err != nil {
+		return nil, errors.Wrap(err, "c.pbClient.Play")
+	}
 
 	return &c, nil
 }
@@ -68,15 +69,22 @@ func New(address string) (Client, error) {
 // NewGame requests a new game with a random seed
 func (c *clientImpl) NewGame() (LocalGame, error) {
 	var pbGame *pb.Game
+	var gameReq pb.GameRequest
+	var playGameReq pb.PlayRequest_GameRequest
+	var playReq pb.PlayRequest
 	var lg LocalGame
 	var err error
 
-	pbGame, err = c.pbClient.StartGame(
-		context.Background(),
-		&pb.GameRequest{},
-	)
-	if err != nil {
-		return LocalGame{}, errors.Wrap(err, "NewGame()")
+	gameReq.Gametype = pb.GameRequest_RANDOM
+	playGameReq.GameRequest = &gameReq
+	playReq.TestOneof = &playGameReq
+
+	if err = c.stream.Send(&playReq); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Send")
+	}
+
+	if pbGame, err = c.stream.Recv(); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Recv()")
 	}
 
 	c.gameID = pbGame.Id
@@ -94,18 +102,23 @@ func (c *clientImpl) NewGame() (LocalGame, error) {
 // ReplayGame requests a new game with a known seed
 func (c *clientImpl) ReplayGame(seed int64) (LocalGame, error) {
 	var pbGame *pb.Game
+	var gameReq pb.GameRequest
+	var playGameReq pb.PlayRequest_GameRequest
+	var playReq pb.PlayRequest
 	var lg LocalGame
 	var err error
 
-	pbGame, err = c.pbClient.StartGame(
-		context.Background(),
-		&pb.GameRequest{
-			Gametype: pb.GameRequest_REPLAY,
-			Seed:     seed,
-		},
-	)
-	if err != nil {
-		return LocalGame{}, errors.Wrap(err, "ReplayGame()")
+	gameReq.Gametype = pb.GameRequest_REPLAY
+	gameReq.Seed = seed
+	playGameReq.GameRequest = &gameReq
+	playReq.TestOneof = &playGameReq
+
+	if err = c.stream.Send(&playReq); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Send")
+	}
+
+	if pbGame, err = c.stream.Recv(); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Recv()")
 	}
 
 	c.gameID = pbGame.Id
@@ -122,20 +135,25 @@ func (c *clientImpl) ReplayGame(seed int64) (LocalGame, error) {
 // Move a card or cards from one stack to another
 func (c *clientImpl) Move(move game.MoveType) (LocalGame, error) {
 	var pbGame *pb.Game
+	var moveReq pb.MoveRequest
+	var playMoveReq pb.PlayRequest_MoveRequest
+	var playReq pb.PlayRequest
 	var lg LocalGame
 	var err error
 
-	pbGame, err = c.pbClient.RequestMove(
-		context.Background(),
-		&pb.MoveRequest{
-			Id:      c.gameID,
-			FromCol: int32(move.FromCol),
-			FromRow: int32(move.FromRow),
-			ToCol:   int32(move.ToCol),
-		},
-	)
-	if err != nil {
-		return LocalGame{}, errors.Wrap(err, "RequestMove()")
+	moveReq.Id = c.gameID
+	moveReq.FromCol = int32(move.FromCol)
+	moveReq.FromRow = int32(move.FromRow)
+	moveReq.ToCol = int32(move.ToCol)
+	playMoveReq.MoveRequest = &moveReq
+	playReq.TestOneof = &playMoveReq
+
+	if err = c.stream.Send(&playReq); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Send")
+	}
+
+	if pbGame, err = c.stream.Recv(); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Recv()")
 	}
 
 	lg.CardsRemaining = int(pbGame.CardsRemaining)
@@ -152,15 +170,22 @@ func (c *clientImpl) Move(move game.MoveType) (LocalGame, error) {
 // Deal the next round of cards
 func (c *clientImpl) Deal() (LocalGame, error) {
 	var pbGame *pb.Game
+	var dealReq pb.DealRequest
+	var playDealReq pb.PlayRequest_DealRequest
+	var playReq pb.PlayRequest
 	var lg LocalGame
 	var err error
 
-	pbGame, err = c.pbClient.RequestDeal(
-		context.Background(),
-		&pb.DealRequest{Id: c.gameID},
-	)
-	if err != nil {
-		return LocalGame{}, errors.Wrap(err, "RequestDeal()")
+	dealReq.Id = c.gameID
+	playDealReq.DealRequest = &dealReq
+	playReq.TestOneof = &playDealReq
+
+	if err = c.stream.Send(&playReq); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Send")
+	}
+
+	if pbGame, err = c.stream.Recv(); err != nil {
+		return LocalGame{}, errors.Wrap(err, "c.stream.Recv()")
 	}
 
 	lg.CardsRemaining = int(pbGame.CardsRemaining)
@@ -174,21 +199,6 @@ func (c *clientImpl) Deal() (LocalGame, error) {
 	return lg, nil
 }
 
-// EndGame stops the current game on the server
-func (c *clientImpl) EndGame() error {
-	var err error
-
-	_, err = c.pbClient.EndGame(
-		context.Background(),
-		&pb.EndGameRequest{Id: c.gameID},
-	)
-	if err != nil {
-		return errors.Wrap(err, "EndGame()")
-	}
-
-	return nil
-}
-
 // Close closes the server connection and releasess all resources
 func (c *clientImpl) Close() error {
 	if c.conn != nil {
@@ -197,6 +207,7 @@ func (c *clientImpl) Close() error {
 		}
 		c.pbClient = nil
 		c.conn = nil
+		c.stream = nil
 		c.gameID = 0
 		return nil
 	}

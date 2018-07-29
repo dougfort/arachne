@@ -2,30 +2,17 @@ package main
 
 import (
 	"net"
-	"sync"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
 	"github.com/ardanlabs/kit/cfg"
 
-	"github.com/dougfort/arachne/internal/game"
-
 	pb "github.com/dougfort/arachne/arachne"
 )
-
-type arachneServer struct {
-	sync.Mutex
-	nextID int64
-	active map[int64]*game.Game
-}
-
-func newServer() *arachneServer {
-	var s arachneServer
-	s.nextID = 1
-	s.active = make(map[int64]*game.Game)
-	return &s
-}
 
 func main() {
 	const cfgNamespace = "arachne"
@@ -46,7 +33,16 @@ func main() {
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterArachneServer(grpcServer, newServer())
-	if err := grpcServer.Serve(lis); err != nil {
-		grpclog.Errorf("grpcServer.Serve failed: %s", err)
-	}
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			grpclog.Errorf("grpcServer.Serve failed: %s", err)
+		}
+	}()
+
+	<-sigChan
+	grpcServer.Stop()
 }

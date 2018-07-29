@@ -1,25 +1,22 @@
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "io.grpc.examples.routeguide";
-option java_outer_classname = "RouteGuideProto";
-
 package arachne;
 
 // Interface exported by the server.
 service Arachne {
 
-    // StartGame starts a new game
-    rpc StartGame(GameRequest) returns (Game) {}
+    // Play executes a stream of game commands, 
+    // streaming back the current state of the game
+    rpc Play(stream PlayRequest) returns (stream Game) {}
 
-    // RequestMove requests a move of cards
-    rpc RequestMove(MoveRequest) returns (Game) {}
+}
 
-    // RequestDeal requests a deal
-    rpc RequestDeal(DealRequest) returns (Game) {}
-
-    // EndGame requests the end of a game
-    rpc EndGame(EndGameRequest) returns (EndGameResponse) {}
+message PlayRequest {
+    oneof test_oneof {
+        GameRequest game_request = 1;
+        MoveRequest move_request = 2;
+        DealRequest deal_request = 3;
+    }
 }
 
 message GameRequest {
@@ -62,9 +59,3 @@ message MoveRequest {
 message DealRequest {
     int64 id = 1;
 }
-
-message EndGameRequest {
-    int64 id = 1;
-}
-
-message EndGameResponse {}
