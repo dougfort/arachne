@@ -9,11 +9,8 @@ import (
 )
 
 // StartGame starts a new game
-func (s *arachneServer) StartGame(
-	request *pb.GameRequest,
-) (*pb.Game, error) {
+func startGame(request *pb.GameRequest) (*game.Game, error) {
 	var localGame *game.Game
-	var pbGame pb.Game
 
 	switch request.Gametype {
 	case pb.GameRequest_RANDOM:
@@ -24,15 +21,5 @@ func (s *arachneServer) StartGame(
 		return nil, errors.Errorf("invalid GameType %d", request.Gametype)
 	}
 
-	pbGame.Seed = localGame.Deck.Seed()
-	pbGame.Stack = arachne2pb(localGame.Tableau)
-	pbGame.CardsRemaining = int32(localGame.Deck.RemainingCards())
-
-	s.Lock()
-	defer s.Unlock()
-
-	pbGame.Id = s.nextID
-	s.nextID++
-	s.active[pbGame.Id] = localGame
-	return &pbGame, nil
+	return localGame, nil
 }

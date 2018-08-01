@@ -31,12 +31,11 @@ message GameRequest {
 }
 
 message Game {
-    int64 id = 1;
-    int64 seed = 2;
-    int32 cardsRemaining = 3;
-    int32 captureCount = 4;
+    int64 seed = 1;
+    int32 cardsRemaining = 2;
+    int32 captureCount = 3;
 
-    repeated Stack stack = 5;
+    repeated Stack stack = 4;
 }
 
 message Stack {
@@ -50,12 +49,9 @@ message Card {
 }
 
 message MoveRequest {
-    int64 id = 1;
-    int32 fromCol = 2;
-    int32 fromRow = 3;
-    int32 toCol = 4;
+    int32 fromCol = 1;
+    int32 fromRow = 2;
+    int32 toCol = 3;
 }
 
-message DealRequest {
-    int64 id = 1;
-}
+message DealRequest {}

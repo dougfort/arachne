@@ -44,7 +44,6 @@ type clientImpl struct {
 	conn     *grpc.ClientConn
 	pbClient pb.ArachneClient
 	stream   pb.Arachne_PlayClient
-	gameID   int64
 }
 
 // New returns an entity that implements the Client interface
@@ -87,8 +86,6 @@ func (c *clientImpl) NewGame() (LocalGame, error) {
 		return LocalGame{}, errors.Wrap(err, "c.stream.Recv()")
 	}
 
-	c.gameID = pbGame.Id
-
 	lg.Seed = pbGame.Seed
 	lg.CardsRemaining = int(pbGame.CardsRemaining)
 
@@ -121,8 +118,6 @@ func (c *clientImpl) ReplayGame(seed int64) (LocalGame, error) {
 		return LocalGame{}, errors.Wrap(err, "c.stream.Recv()")
 	}
 
-	c.gameID = pbGame.Id
-
 	lg.CardsRemaining = int(pbGame.CardsRemaining)
 
 	if lg.Tableau, err = pb2arachne(pbGame); err != nil {
@@ -141,7 +136,6 @@ func (c *clientImpl) Move(move game.MoveType) (LocalGame, error) {
 	var lg LocalGame
 	var err error
 
-	moveReq.Id = c.gameID
 	moveReq.FromCol = int32(move.FromCol)
 	moveReq.FromRow = int32(move.FromRow)
 	moveReq.ToCol = int32(move.ToCol)
@@ -176,7 +170,6 @@ func (c *clientImpl) Deal() (LocalGame, error) {
 	var lg LocalGame
 	var err error
 
-	dealReq.Id = c.gameID
 	playDealReq.DealRequest = &dealReq
 	playReq.TestOneof = &playDealReq
 
@@ -208,7 +201,6 @@ func (c *clientImpl) Close() error {
 		c.pbClient = nil
 		c.conn = nil
 		c.stream = nil
-		c.gameID = 0
 		return nil
 	}
 	return errors.Errorf("already Closed")

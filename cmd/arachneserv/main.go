@@ -43,6 +43,7 @@ func main() {
 		}
 	}()
 
-	<-sigChan
+	s := <-sigChan
+	grpclog.Infof("server received %v: terminating", s)
 	grpcServer.Stop()
 }

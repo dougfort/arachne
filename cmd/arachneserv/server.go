@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"sync"
 
 	"github.com/pkg/errors"
 
@@ -10,23 +9,16 @@ import (
 	"github.com/dougfort/arachne/internal/game"
 )
 
-type arachneServer struct {
-	sync.Mutex
-	nextID int64
-	active map[int64]*game.Game
-}
+type arachneServer struct{}
 
-func newServer() *arachneServer {
-	var s arachneServer
-	s.nextID = 1
-	s.active = make(map[int64]*game.Game)
-	return &s
+func newServer() arachneServer {
+	return arachneServer{}
 }
 
 // Play executes a stream of game commands,
 // streaming back the current state of the game
-func (a *arachneServer) Play(stream pb.Arachne_PlayServer) error {
-	var game *pb.Game
+func (a arachneServer) Play(stream pb.Arachne_PlayServer) error {
+	var localGame *game.Game
 
 	for {
 		playReq, err := stream.Recv()
@@ -37,28 +29,46 @@ func (a *arachneServer) Play(stream pb.Arachne_PlayServer) error {
 			return err
 		}
 
+		var capture bool
+
 		switch playReq.GetTestOneof().(type) {
 		case *pb.PlayRequest_GameRequest:
-			game, err = a.StartGame(playReq.GetGameRequest())
-			if err != nil {
-				return errors.Wrapf(err, "a.StartGame")
+			if localGame, err = startGame(playReq.GetGameRequest()); err != nil {
+				return errors.Wrapf(err, "startGame")
 			}
 		case *pb.PlayRequest_MoveRequest:
-			game, err = a.RequestMove(playReq.GetMoveRequest())
+			capture, err = requestMove(localGame, playReq.GetMoveRequest())
 			if err != nil {
-				return errors.Wrapf(err, "a.RequestMove")
+				return errors.Wrapf(err, "requestMove")
 			}
 		case *pb.PlayRequest_DealRequest:
-			game, err = a.RequestDeal(playReq.GetDealRequest())
-			if err != nil {
-				return errors.Wrapf(err, "a.RequestDeal")
+			if err = localGame.Deal(); err != nil {
+				return errors.Wrapf(err, "Deal")
 			}
 		default:
 			return errors.Errorf("unknown request")
 		}
 
-		if err = stream.Send(game); err != nil {
-			return errors.Wrapf(err, "Send()")
+		if err = sendGame(localGame, capture, stream); err != nil {
+			return errors.Wrapf(err, "sendGame")
 		}
 	}
+}
+
+func sendGame(localGame *game.Game, capture bool, stream pb.Arachne_PlayServer) error {
+	var pbGame pb.Game
+	var err error
+
+	pbGame.Seed = localGame.Deck.Seed()
+	pbGame.Stack = arachne2pb(localGame.Tableau)
+	pbGame.CardsRemaining = int32(localGame.Deck.RemainingCards())
+	if capture {
+		pbGame.CaptureCount++
+	}
+
+	if err = stream.Send(&pbGame); err != nil {
+		return errors.Wrapf(err, "Send()")
+	}
+
+	return nil
 }
