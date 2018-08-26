@@ -8,8 +8,6 @@ import (
 
 // EnumerateMoves lists all possible legal moves in the current
 // Tableau.
-// The returned slice is ordered by the perceived desirability of
-// the move.
 func (t Tableau) EnumerateMoves() []EvaluatedMoveType {
 	var err error
 	var moves []EvaluatedMoveType
