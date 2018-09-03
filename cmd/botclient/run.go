@@ -83,7 +83,15 @@ func run() int {
 TURN_LOOP:
 	for turn := 1; maxTurns == -1 || turn <= maxTurns; turn++ {
 
-		availableMoves := lg.Tableau.EnumerateMoves()
+		var availableMoves []game.EvaluatedMoveType
+		enumeratedMoves := lg.Tableau.EnumerateMoves()
+		for _, move := range enumeratedMoves {
+			_, ok := completedMoves[move.MoveType]
+			if !ok {
+				availableMoves = append(availableMoves, move)
+			}
+		}
+
 		if len(availableMoves) == 0 {
 			if lg.CardsRemaining == 0 {
 				log.User(logCtx, fname, "ends in deadlock")
@@ -106,12 +114,6 @@ TURN_LOOP:
 
 		// Pick the most highly rated move
 		move := orderedMoves[len(orderedMoves)-1]
-
-		// Don't go into a loop repeating moves
-		if _, ok := completedMoves[move.EvaluatedMoveType.MoveType]; ok {
-			log.User(logCtx, fname, "repeated move: %s", move)
-			return -1
-		}
 
 		if lg, err = c.Move(move.MoveType); err != nil {
 			log.Error(logCtx, fname, err, "Move(%s)", move.MoveType)
