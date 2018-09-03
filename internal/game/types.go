@@ -59,12 +59,17 @@ type EvaluatedMoveType struct {
 // String shows the move in human readable form
 // Note that displayed coordinates start at 1
 func (m EvaluatedMoveType) String() string {
-	return fmt.Sprintf("(%2d, %2d) -> %2d: from(%2d) + to(%2d) = %2d",
+	return fmt.Sprintf("(%2d, %2d) -> %2d",
 		m.FromCol+1,
 		m.FromRow+1,
 		m.ToCol+1,
-		m.FromCount,
-		m.ToCount,
-		m.FromCount+m.ToCount,
 	)
+}
+
+// Orderer an interface for objects which put possible moves in some
+// (preferential) order
+type Orderer interface {
+
+	// Order puts possible moves in some (preferential) order
+	Order([]EvaluatedMoveType) error
 }

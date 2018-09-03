@@ -65,7 +65,14 @@ func run() int {
 		fmt.Printf("NewGame failed: %v\n", err)
 		return -1
 	}
-	displayGameData(lg)
+
+	orderer := gamelib.NewHighestMove()
+
+	if err = displayGameData(lg, orderer); err != nil {
+		fmt.Printf("displayGameData failed: %v\n", err)
+		return -1
+	}
+
 	fmt.Println("")
 	fmt.Print(">")
 
@@ -76,7 +83,7 @@ RUN_LOOP:
 		rawLine := scanner.Text()
 		splitLine := strings.SplitN(rawLine, " ", 2)
 		if len(splitLine) == 0 {
-			fmt.Println("unarsable command")
+			fmt.Println("unparsable command")
 			continue RUN_LOOP
 		}
 		switch splitLine[0] {
@@ -86,11 +93,17 @@ RUN_LOOP:
 				fmt.Printf("NewGame failed: %v\n", err)
 				break RUN_LOOP
 			}
-			displayGameData(lg)
+			if err = displayGameData(lg, orderer); err != nil {
+				fmt.Printf("displayGameData failed: %v\n", err)
+				break RUN_LOOP
+			}
 		case "display":
 			displayTableauStrings(lg.Tableau)
 		case "scan":
-			displayMoves(lg.Tableau)
+			if err = displayMoves(lg.Tableau, orderer); err != nil {
+				fmt.Printf("Unable to display tableau: %s\n", err)
+				continue RUN_LOOP
+			}
 		case "move":
 			var move gamelib.MoveType
 			if move, err = parseMoveComand(splitLine); err != nil {
@@ -101,7 +114,10 @@ RUN_LOOP:
 				fmt.Printf("move failed: %s\n", err)
 				continue RUN_LOOP
 			}
-			displayGameData(lg)
+			if err = displayGameData(lg, orderer); err != nil {
+				fmt.Printf("displayGameData failed: %v\n", err)
+				break RUN_LOOP
+			}
 		case "deal":
 			if lg.CardsRemaining == 0 {
 				fmt.Println("no cards available to deal")
@@ -115,7 +131,10 @@ RUN_LOOP:
 				fmt.Printf("deal failed: %v\n", err)
 				continue RUN_LOOP
 			}
-			displayGameData(lg)
+			if err = displayGameData(lg, orderer); err != nil {
+				fmt.Printf("displayGameData failed: %v\n", err)
+				break RUN_LOOP
+			}
 		case "quit":
 			fmt.Println("quitting")
 			if err := c.Close(); err != nil {
@@ -134,7 +153,7 @@ RUN_LOOP:
 	return exitCode
 }
 
-func displayGameData(lg client.LocalGame) {
+func displayGameData(lg client.LocalGame, orderer gamelib.Orderer) error {
 	fmt.Printf("seed: %d\n", lg.Seed)
 	fmt.Println("")
 	fmt.Printf("captures: %d\n", lg.CaptureCount)
@@ -143,7 +162,11 @@ func displayGameData(lg client.LocalGame) {
 	fmt.Println("")
 	displayTableauStrings(lg.Tableau)
 	fmt.Println("")
-	displayMoves(lg.Tableau)
+	if err := displayMoves(lg.Tableau, orderer); err != nil {
+		return errors.Wrap(err, "displayMoves")
+	}
+
+	return nil
 }
 
 func parseMoveComand(splitLine []string) (gamelib.MoveType, error) {

@@ -9,6 +9,7 @@ import (
 	"github.com/ardanlabs/kit/log"
 
 	"github.com/dougfort/arachne/internal/client"
+	"github.com/dougfort/arachne/internal/game"
 )
 
 // run is the actual main body of the program
@@ -23,6 +24,7 @@ func run() int {
 	var maxTurns int
 	var c client.Client
 	var lg client.LocalGame
+	var orderer game.Orderer
 	var err error
 
 	err = cfg.Init(cfg.EnvProvider{Namespace: cfgNamespace})
@@ -74,6 +76,7 @@ func run() int {
 		log.User(logCtx, fname, "replay")
 	}
 
+	orderer = game.NewHighestMove()
 	maxTurns = cfg.MustInt("MAX_TURNS")
 
 TURN_LOOP:
@@ -92,8 +95,12 @@ TURN_LOOP:
 			continue TURN_LOOP
 		}
 
-		// TODO: analyze the moves,instead of picking the first one
-		move := availableMoves[0]
+		if err = orderer.Order(availableMoves); err != nil {
+			log.Error(logCtx, fname, err, "orderer.Order")
+		}
+
+		// Pick the most highly rated move
+		move := availableMoves[len(availableMoves)-1]
 
 		if lg, err = c.Move(move.MoveType); err != nil {
 			log.Error(logCtx, fname, err, "Move(%s)", move.MoveType)
