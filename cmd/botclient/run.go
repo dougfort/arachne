@@ -78,9 +78,11 @@ func run() int {
 
 	orderer = game.NewHighestMove()
 	maxTurns = cfg.MustInt("MAX_TURNS")
+	completedMoves := make(map[game.MoveType]struct{})
 
 TURN_LOOP:
 	for turn := 1; maxTurns == -1 || turn <= maxTurns; turn++ {
+
 		availableMoves := lg.Tableau.EnumerateMoves()
 		if len(availableMoves) == 0 {
 			if lg.CardsRemaining == 0 {
@@ -92,15 +94,24 @@ TURN_LOOP:
 				log.Error(logCtx, fname, err, "Deal()")
 				return -1
 			}
+			completedMoves = make(map[game.MoveType]struct{})
 			continue TURN_LOOP
 		}
 
-		if err = orderer.Order(availableMoves); err != nil {
+		orderedMoves, err := orderer.Order(availableMoves)
+		if err != nil {
 			log.Error(logCtx, fname, err, "orderer.Order")
+			return -1
 		}
 
 		// Pick the most highly rated move
-		move := availableMoves[len(availableMoves)-1]
+		move := orderedMoves[len(orderedMoves)-1]
+
+		// Don't go into a loop repeating moves
+		if _, ok := completedMoves[move.EvaluatedMoveType.MoveType]; ok {
+			log.User(logCtx, fname, "repeated move: %s", move)
+			return -1
+		}
 
 		if lg, err = c.Move(move.MoveType); err != nil {
 			log.Error(logCtx, fname, err, "Move(%s)", move.MoveType)
@@ -108,6 +119,7 @@ TURN_LOOP:
 		}
 
 		log.User(logCtx, fname, move.String())
+		completedMoves[move.EvaluatedMoveType.MoveType] = struct{}{}
 	}
 
 	return 0

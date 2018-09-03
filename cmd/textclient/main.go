@@ -88,13 +88,28 @@ RUN_LOOP:
 		}
 		switch splitLine[0] {
 		case "new":
-			fmt.Println("starting new game")
+			fmt.Println("starting new random game")
 			if lg, err = c.NewGame(); err != nil {
 				fmt.Printf("NewGame failed: %v\n", err)
 				break RUN_LOOP
 			}
 			if err = displayGameData(lg, orderer); err != nil {
 				fmt.Printf("displayGameData failed: %v\n", err)
+				break RUN_LOOP
+			}
+		case "replay":
+			if len(splitLine) < 2 {
+				fmt.Println("no seed value given for replay")
+				continue RUN_LOOP
+			}
+			seed, err := strconv.ParseInt(splitLine[1], 10, 64)
+			if err != nil {
+				fmt.Printf("Unable to parse seed '%s'\n", splitLine[1])
+				continue RUN_LOOP
+			}
+			fmt.Println("replaying game from seed %d", seed)
+			if lg, err = c.ReplayGame(seed); err != nil {
+				fmt.Printf("ReplayGame(%d) failed: %v\n", seed, err)
 				break RUN_LOOP
 			}
 		case "display":

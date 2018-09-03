@@ -12,13 +12,17 @@ func NewHighestMove() HighestMoveStruct {
 
 // Order places the moves in order by highest count of sequential cards of the
 // same suit after move
-func (h HighestMoveStruct) Order(s []EvaluatedMoveType) error {
-	sort.Slice(
-		s,
-		func(i, j int) bool {
-			return (s[i].FromCount + s[i].ToCount) < (s[j].FromCount + s[j].ToCount)
-		},
-	)
+func (h HighestMoveStruct) Order(eSlice []EvaluatedMoveType) ([]RankedMoveType, error) {
+	var rSlice []RankedMoveType
 
-	return nil
+	for _, e := range eSlice {
+		rSlice = append(
+			rSlice,
+			RankedMoveType{EvaluatedMoveType: e, Rank: e.FromCount + e.ToCount},
+		)
+	}
+
+	sort.Slice(rSlice, func(i, j int) bool { return rSlice[i].Rank < rSlice[j].Rank })
+
+	return rSlice, nil
 }
