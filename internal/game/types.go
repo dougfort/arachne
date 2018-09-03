@@ -59,12 +59,37 @@ type EvaluatedMoveType struct {
 // String shows the move in human readable form
 // Note that displayed coordinates start at 1
 func (m EvaluatedMoveType) String() string {
-	return fmt.Sprintf("(%2d, %2d) -> %2d: from(%2d) + to(%2d) = %2d",
+	return fmt.Sprintf("(%2d, %2d) -> %2d",
 		m.FromCol+1,
 		m.FromRow+1,
 		m.ToCol+1,
-		m.FromCount,
-		m.ToCount,
-		m.FromCount+m.ToCount,
 	)
+}
+
+// RankedMoveType is EvaluatedMoveType assigned a rank
+type RankedMoveType struct {
+	EvaluatedMoveType
+
+	// Rank is an arbitrary number assigned by the Orderer
+	// The higher the Rank, the more valuable the move is presumed to be
+	Rank int
+}
+
+// String shows the ranked move in human readable form
+// Note that displayed coordinates start at 1
+func (m RankedMoveType) String() string {
+	return fmt.Sprintf("(%2d, %2d) -> %2d: rank = %d",
+		m.FromCol+1,
+		m.FromRow+1,
+		m.ToCol+1,
+		m.Rank,
+	)
+}
+
+// Orderer an interface for objects which put possible moves in some
+// (preferential) order
+type Orderer interface {
+
+	// Order puts possible moves in some (preferential) order
+	Order([]EvaluatedMoveType) ([]RankedMoveType, error)
 }

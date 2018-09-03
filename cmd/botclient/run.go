@@ -9,6 +9,7 @@ import (
 	"github.com/ardanlabs/kit/log"
 
 	"github.com/dougfort/arachne/internal/client"
+	"github.com/dougfort/arachne/internal/game"
 )
 
 // run is the actual main body of the program
@@ -23,6 +24,7 @@ func run() int {
 	var maxTurns int
 	var c client.Client
 	var lg client.LocalGame
+	var orderer game.Orderer
 	var err error
 
 	err = cfg.Init(cfg.EnvProvider{Namespace: cfgNamespace})
@@ -74,11 +76,22 @@ func run() int {
 		log.User(logCtx, fname, "replay")
 	}
 
+	orderer = game.NewHighestMove()
 	maxTurns = cfg.MustInt("MAX_TURNS")
+	completedMoves := make(map[game.MoveType]struct{})
 
 TURN_LOOP:
 	for turn := 1; maxTurns == -1 || turn <= maxTurns; turn++ {
-		availableMoves := lg.Tableau.EnumerateMoves()
+
+		var availableMoves []game.EvaluatedMoveType
+		enumeratedMoves := lg.Tableau.EnumerateMoves()
+		for _, move := range enumeratedMoves {
+			_, ok := completedMoves[move.MoveType]
+			if !ok {
+				availableMoves = append(availableMoves, move)
+			}
+		}
+
 		if len(availableMoves) == 0 {
 			if lg.CardsRemaining == 0 {
 				log.User(logCtx, fname, "ends in deadlock")
@@ -89,11 +102,18 @@ TURN_LOOP:
 				log.Error(logCtx, fname, err, "Deal()")
 				return -1
 			}
+			completedMoves = make(map[game.MoveType]struct{})
 			continue TURN_LOOP
 		}
 
-		// TODO: analyze the moves,instead of picking the first one
-		move := availableMoves[0]
+		orderedMoves, err := orderer.Order(availableMoves)
+		if err != nil {
+			log.Error(logCtx, fname, err, "orderer.Order")
+			return -1
+		}
+
+		// Pick the most highly rated move
+		move := orderedMoves[len(orderedMoves)-1]
 
 		if lg, err = c.Move(move.MoveType); err != nil {
 			log.Error(logCtx, fname, err, "Move(%s)", move.MoveType)
@@ -101,6 +121,7 @@ TURN_LOOP:
 		}
 
 		log.User(logCtx, fname, move.String())
+		completedMoves[move.EvaluatedMoveType.MoveType] = struct{}{}
 	}
 
 	return 0
